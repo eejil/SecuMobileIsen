@@ -147,6 +147,8 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
                 .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
             Log.d(TAG, "OUI")
+            val intent = Intent(this@MainActivity, MainActivity::class.java)
+            startActivity(intent)
         }
 
     }
