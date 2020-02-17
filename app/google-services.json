@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "389641622079",
+    "firebase_url": "https://securitemobileisen.firebaseio.com",
+    "project_id": "securitemobileisen",
+    "storage_bucket": "securitemobileisen.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:389641622079:android:980a3652b08e01f2181e8a",
+        "android_client_info": {
+          "package_name": "com.isen.secumobileisen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "389641622079-stucpgq04s56al9vmeslbpbht15pi71v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.isen.secumobileisen",
+            "certificate_hash": "7ea9fc23daeab9ac902a7b8bcd2ed5af19fc3ef0"
+          }
+        },
+        {
+          "client_id": "389641622079-j8m6ptojvh4ao80dv56b7sghumibeutr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBf_5U1FI-V7HK3sAC7Dj_N_iA8urS814o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "389641622079-j8m6ptojvh4ao80dv56b7sghumibeutr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
