@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private inner class ProductViewHolder internal constructor(private val view: View) : RecyclerView.ViewHolder(view) {
+    private inner class ProductViewHolder internal constructor(private val view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
         internal fun setPatientName(Name: String) {
             val patientName = view.findViewById<TextView>(R.id.patientName)
             patientName.text = Name
@@ -133,12 +133,21 @@ class MainActivity : AppCompatActivity() {
             val patientToday = view.findViewById<TextView>(R.id.patientToday)
             patientToday.text = Today
         }
-        /*internal fun setPatientImage(Image: String) {
-            val patientImage = view.findViewById<TextView>(R.id.patientImage)
-            patientImage.text = Image
-        }*/
 
+        protected var btn_delete: ImageView
 
+        init {
+            btn_delete = itemView.findViewById(R.id.btn_delete)
+            btn_delete.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View) {
+            db.collection("patients").document(patientName.text.toString())
+                .delete()
+                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
+                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+            Log.d(TAG, "OUI")
+        }
 
     }
 
@@ -158,22 +167,9 @@ class MainActivity : AppCompatActivity() {
             return ProductViewHolder(view)
         }
 
-        inner class ProducViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-            protected var btn_delete: ImageView
 
-            init {
-                btn_delete = itemView.findViewById(R.id.btn_delete)
-                btn_delete.setOnClickListener(this)
-            }
 
-            override fun onClick(v: View) {
-                db.collection("patients").document(patientName.text.toString())
-                    .delete()
-                    .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
-                    .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-                Log.d(TAG, "OUI")
-            }
-        }
+
 
     }
 
