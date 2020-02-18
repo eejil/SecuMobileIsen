@@ -92,5 +92,9 @@ class FormActivity : AppCompatActivity() {
             .set(newPatient)
             .addOnSuccessListener { Log.d("Success :", "DocumentSnapshot successfully written!") }
             .addOnFailureListener { e -> Log.w("Error :", "Error writing document", e) }
+        cloudFirestore.collection("histopatients").document(newPatient.name)
+            .set(newPatient)
+            .addOnSuccessListener { Log.d("Success :", "DocumentSnapshot successfully written!") }
+            .addOnFailureListener { e -> Log.w("Error :", "Error writing document", e) }
     }
 }

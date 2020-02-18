@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="200dp">
+
+    <TextView
+        android:id="@+id/patientName"
+        android:layout_width="90dp"
+        android:layout_height="45dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Name"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txt_patho"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/patientPathology"
+        android:layout_width="90dp"
+        android:layout_height="45dp"
+        android:layout_below="@+id/patientName"
+        android:layout_marginEnd="24dp"
+        android:text="Pathology"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_patho"
+        app:layout_constraintEnd_toStartOf="@+id/txt_treat"
+        app:layout_constraintTop_toTopOf="@+id/txt_patho"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/patientTreatments"
+        android:layout_width="90dp"
+        android:layout_height="45dp"
+        android:layout_below="@+id/patientDate"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="24dp"
+        android:layout_toEndOf="@+id/patientPathology"
+        android:text="Treatments"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_treat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/txt_treat" />
+
+    <TextView
+        android:id="@+id/patientDate"
+        android:layout_width="101dp"
+        android:layout_height="45dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="100dp"
+        android:layout_toEndOf="@+id/patientName"
+        android:text="Date"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txt_treat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/patientToday"
+        android:layout_width="266dp"
+        android:layout_height="52dp"
+        android:layout_below="@+id/patientPathology"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="16dp"
+        android:text="Today"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_delete"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/txt_patho"
+        android:layout_width="83dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Pathologie : "
+        app:layout_constraintBottom_toTopOf="@+id/patientToday"
+        app:layout_constraintEnd_toStartOf="@+id/patientPathology"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/txt_treat"
+        android:layout_width="86dp"
+        android:layout_height="44dp"
+        android:layout_marginBottom="16dp"
+        android:text="Traitement : "
+        app:layout_constraintBottom_toTopOf="@+id/patientToday"
+        app:layout_constraintEnd_toStartOf="@+id/patientTreatments" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="16dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
