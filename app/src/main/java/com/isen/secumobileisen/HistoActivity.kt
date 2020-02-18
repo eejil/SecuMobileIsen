@@ -26,11 +26,11 @@ class HistoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_histo)
 
         val query = db!!.collection("histopatients").orderBy("name", Query.Direction.ASCENDING)
 
-        recycler_view = findViewById(R.id.listView)
+        recycler_view = findViewById(R.id.histoView)
         recycler_view.layoutManager = LinearLayoutManager(this)
         val options = FirestoreRecyclerOptions.Builder<Patients>().setQuery(query, Patients::class.java).build()
 
@@ -55,23 +55,23 @@ class HistoActivity : AppCompatActivity() {
 
     private inner class ProductViewHolder internal constructor(private val view: View) : RecyclerView.ViewHolder(view) {
         internal fun setPatientName(Name: String) {
-            val patientName = view.findViewById<TextView>(R.id.patientName)
+            val patientName = view.findViewById<TextView>(R.id.histoName)
             patientName.text = Name
         }
         internal fun setPatientDate(Date: String) {
-            val patientDate = view.findViewById<TextView>(R.id.patientDate)
+            val patientDate = view.findViewById<TextView>(R.id.histoDate)
             patientDate.text = Date
         }
         internal fun setPatientPathology(Pathology: String) {
-            val patientPathology = view.findViewById<TextView>(R.id.patientPathology)
+            val patientPathology = view.findViewById<TextView>(R.id.histoPathology)
             patientPathology.text = Pathology
         }
         internal fun setPatientTreatments(Treatments: String) {
-            val patientTreatments = view.findViewById<TextView>(R.id.patientTreatments)
+            val patientTreatments = view.findViewById<TextView>(R.id.histoTreatments)
             patientTreatments.text = Treatments
         }
         internal fun setPatientToday(Today: String) {
-            val patientToday = view.findViewById<TextView>(R.id.patientToday)
+            val patientToday = view.findViewById<TextView>(R.id.histoToday)
             patientToday.text = Today
         }
     }

@@ -49,22 +49,6 @@ class MainActivity : AppCompatActivity() {
         adapter = ProductFirestoreRecyclerAdapter(options)
         recycler_view.adapter = adapter
 
-
-        // [END handle_data_extras]
-
-            val docRef = db.collection("patients").document("paul")
-            docRef.get()
-                .addOnSuccessListener { document ->
-                    if (document != null) {
-                        Log.d(TAG, "DocumentSnapshot data: ${document.data}")
-                    } else {
-                        Log.d(TAG, "No such document")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.d(TAG, "get failed with ", exception)
-                }
-
         btn_form.setOnClickListener {
             goToForm()
         }
@@ -89,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private inner class ProductViewHolder internal constructor(private val view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+    private inner class PatientViewHolder internal constructor(private val view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
         internal fun setPatientName(Name: String) {
             val patientName = view.findViewById<TextView>(R.id.patientName)
             patientName.text = Name
@@ -124,14 +108,14 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
                 .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
             Log.d(TAG, "OUI")
-            val intent = Intent(this@MainActivity, MainActivity::class.java)
-            startActivity(intent)
+            finish()
+            startActivity(getIntent())
         }
 
     }
 
-    private inner class ProductFirestoreRecyclerAdapter internal constructor(options: FirestoreRecyclerOptions<Patients>) : FirestoreRecyclerAdapter<Patients, ProductViewHolder>(options) {
-        override fun onBindViewHolder(productViewHolder: ProductViewHolder, position: Int, patients: Patients) {
+    private inner class ProductFirestoreRecyclerAdapter internal constructor(options: FirestoreRecyclerOptions<Patients>) : FirestoreRecyclerAdapter<Patients, PatientViewHolder>(options) {
+        override fun onBindViewHolder(productViewHolder: PatientViewHolder, position: Int, patients: Patients) {
             productViewHolder.setPatientName(patients.name)
             productViewHolder.setPatientDate(patients.date)
             productViewHolder.setPatientToday(patients.today)
@@ -140,10 +124,10 @@ class MainActivity : AppCompatActivity() {
             //productViewHolder.setPatientImage(patients.image)
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.list_layout, parent, false)
 
-            return ProductViewHolder(view)
+            return PatientViewHolder(view)
         }
 
 
