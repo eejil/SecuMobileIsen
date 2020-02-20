@@ -126,14 +126,8 @@ class MainActivity : AppCompatActivity() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.list_layout, parent, false)
-
             return PatientViewHolder(view)
         }
-
-
-
-
-
     }
 
     private fun goToForm() {

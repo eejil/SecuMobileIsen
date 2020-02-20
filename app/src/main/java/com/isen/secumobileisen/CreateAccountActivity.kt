@@ -52,6 +52,7 @@ class CreateAccountActivity : AppCompatActivity() {
         btnCreateAccount = findViewById<View>(R.id.btn_register) as Button
         mProgressBar = ProgressDialog(this)
         mDatabase = FirebaseDatabase.getInstance()
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
         mDatabaseReference = mDatabase!!.reference!!.child("Users")
         mAuth = FirebaseAuth.getInstance()
         btnCreateAccount!!.setOnClickListener { createNewAccount() }
@@ -78,7 +79,7 @@ class CreateAccountActivity : AppCompatActivity() {
                         Log.d(TAG, "createUserWithEmail:success")
                         val userId = mAuth!!.currentUser!!.uid
                         //Verify Email
-                        verifyEmail();
+                        verifyEmail()
                         //update user profile information
                         val currentUserDb = mDatabaseReference!!.child(userId)
                         currentUserDb.child("firstName").setValue(firstName)
