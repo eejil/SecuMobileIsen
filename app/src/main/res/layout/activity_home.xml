@@ -23,8 +23,8 @@
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:layout_marginStart="96dp"
-        android:layout_marginBottom="52dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_logout"
+        android:layout_marginBottom="44dp"
+        app:layout_constraintBottom_toTopOf="@+id/listPIcon"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@android:drawable/ic_menu_sort_alphabetically" />
 
@@ -42,10 +42,21 @@
         android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="260dp"
+        android:layout_marginBottom="184dp"
         android:text="LOGOUT"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/listPIcon"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginBottom="76dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@android:drawable/stat_notify_sdcard" />
 </androidx.constraintlayout.widget.ConstraintLayout>

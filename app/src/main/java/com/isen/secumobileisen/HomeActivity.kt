@@ -1,6 +1,5 @@
 package com.isen.secumobileisen
 
-import android.app.ListActivity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -22,6 +21,10 @@ class HomeActivity : AppCompatActivity() {
             goToList()
         }
 
+        listPIcon.setOnClickListener {
+            goToListP()
+        }
+
         btn_logout.setOnClickListener {
             logout()
         }
@@ -37,6 +40,13 @@ class HomeActivity : AppCompatActivity() {
     private fun goToList() {
         //start next activity
         val intent = Intent(this@HomeActivity, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+    }
+
+    private fun goToListP() {
+        //start next activity
+        val intent = Intent(this@HomeActivity, ListActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
     }
