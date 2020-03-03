@@ -17,12 +17,17 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.list_layout.*
+import java.util.*
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 class HistoActivity : AppCompatActivity() {
 
     lateinit var recycler_view: RecyclerView
     private var adapter: ProductFirestoreRecyclerAdapter? = null
     private val db = FirebaseFirestore.getInstance()
+    val key = "jdtestelekotlin"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,11 +83,17 @@ class HistoActivity : AppCompatActivity() {
 
     private inner class ProductFirestoreRecyclerAdapter internal constructor(options: FirestoreRecyclerOptions<Patients>) : FirestoreRecyclerAdapter<Patients, ProductViewHolder>(options) {
         override fun onBindViewHolder(productViewHolder: ProductViewHolder, position: Int, patients: Patients) {
-            productViewHolder.setPatientName(patients.name)
-            productViewHolder.setPatientDate(patients.date)
-            productViewHolder.setPatientToday(patients.today)
-            productViewHolder.setPatientPathology(patients.pathology)
-            productViewHolder.setPatientTreatments(patients.treatments)
+            var name = decrypt(patients.name,key)
+            var patho = decrypt(patients.pathology,key)
+            var traitement = decrypt(patients.treatments,key)
+            var description = decrypt(patients.today,key)
+            var dateVisite = decrypt(patients.date,key)
+
+            productViewHolder.setPatientName(name.toString())
+            productViewHolder.setPatientDate(patho.toString())
+            productViewHolder.setPatientToday(traitement.toString())
+            productViewHolder.setPatientPathology(description.toString())
+            productViewHolder.setPatientTreatments(dateVisite.toString())
             //productViewHolder.setPatientImage(patients.image)
         }
 
@@ -91,6 +102,45 @@ class HistoActivity : AppCompatActivity() {
 
             return ProductViewHolder(view)
         }
+    }
+
+    fun encrypt(strToEncrypt: String, secret: String): String? {
+        try {
+            var key: ByteArray
+            key = secret.toByteArray()
+            key = Arrays.copyOf(key, 16)
+            var secretKey = SecretKeySpec(key, "AES")
+            var iv = "jdetestelekotlin"
+            val ivParam = IvParameterSpec(iv.toByteArray())
+
+            val cipher =
+                Cipher.getInstance("AES/CBC/PKCS5Padding")
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParam)
+            return Base64.getEncoder()
+                .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
+        } catch (e: Exception) {
+            println("Error while encrypting: $e")
+        }
+        return null
+    }
+
+    fun decrypt(strToDecrypt: String?, secret: String): String? {
+        try {
+            var key: ByteArray
+            key = secret.toByteArray()
+            key = Arrays.copyOf(key, 16)
+            var secretKey = SecretKeySpec(key, "AES")
+            var iv = "jdetestelekotlin"
+            val ivParam = IvParameterSpec(iv.toByteArray())
+
+            val cipher =
+                Cipher.getInstance("AES/CBC/PKCS5Padding")
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParam)
+            return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
+        } catch (e: java.lang.Exception) {
+            println("Error while decrypting: $e")
+        }
+        return null
     }
 
     companion object {
