@@ -1,7 +1,12 @@
 package com.isen.secumobileisen
 
+import android.Manifest
+import android.app.Activity
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -13,13 +18,14 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
 
 
 class LoginActivity : AppCompatActivity() {
@@ -40,6 +46,8 @@ class LoginActivity : AppCompatActivity() {
 
     private var keyAES = generateSymmetricKey("keyAES")
 
+    private var NETWORK_PERMISSION = 10
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -50,6 +58,30 @@ class LoginActivity : AppCompatActivity() {
             generateSymmetricKey(et_key.text.toString())
         }
        */
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            NETWORK_PERMISSION -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return
+            }
+
+            // Add other 'when' lines to check for other
+            // permissions this app might request.
+            else -> {
+                // Ignore all other requests.
+            }
+        }
     }
 
     override fun onResume() {
@@ -75,33 +107,52 @@ class LoginActivity : AppCompatActivity() {
     private fun loginUser() {
         email = etEmail?.text.toString()
         password = etPassword?.text.toString()
-        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
-            mProgressBar!!.setMessage("Registering User...")
-            mProgressBar!!.show()
-            Log.d(TAG, "Logging in user.")
-            mAuth!!.signInWithEmailAndPassword(email!!, password!!)
-                .addOnCompleteListener(this) { task ->
-                    mProgressBar!!.hide()
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with signed-in user's information
-                        Log.d(TAG, "signInWithEmail:success")
-                        updateUI()
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.e(TAG, "signInWithEmail:failure", task.exception)
-                        Toast.makeText(this@LoginActivity, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show()
+        if(checkNetwork()) {
+            if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+                mProgressBar!!.setMessage("Registering User...")
+                mProgressBar!!.show()
+                Log.d(TAG, "Logging in user.")
+                mAuth!!.signInWithEmailAndPassword(email!!, password!!)
+                    .addOnCompleteListener(this) { task ->
+                        mProgressBar!!.hide()
+                        if (task.isSuccessful) {
+                            // Sign in success, update UI with signed-in user's information
+                            Log.d(TAG, "signInWithEmail:success")
+                            updateUI()
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.e(TAG, "signInWithEmail:failure", task.exception)
+                            Toast.makeText(
+                                this@LoginActivity, "Authentication failed.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
-                }
-        } else {
-            Toast.makeText(this, "Enter all details", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Enter all details", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        else {
+            if(checkSharedPreferences(email.toString(),password.toString())) {
+                val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                startActivity(intent)
+                finish()
+            }
+
+            else {
+                Toast.makeText(
+                    this@LoginActivity, "Authentication failed.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
     private fun updateUI() {
         val intent = Intent(this@LoginActivity, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        intent.putExtra("KEY_AES", keyAES);
         startActivity(intent)
         finish()
     }
@@ -163,5 +214,54 @@ class LoginActivity : AppCompatActivity() {
         secretKey = (keyStore.getEntry(keyAlias, null) as KeyStore.SecretKeyEntry).secretKey
 
         return secretKey
+    }
+
+    private fun checkSharedPreferences(mail: String, password: String): Boolean {
+        val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
+        val mail_alias = "mail" + mail
+        val password_alias = "password" + password
+
+        if(db.contains(mail_alias)) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun checkNetwork(): Boolean {
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
+
+
+    private fun askNetworkPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_NETWORK_STATE)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_NETWORK_STATE)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_NETWORK_STATE),
+                    NETWORK_PERMISSION)
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+        }
+
     }
 }

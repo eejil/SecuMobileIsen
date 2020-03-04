@@ -1,8 +1,8 @@
 package com.isen.secumobileisen
 
+import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -10,9 +10,11 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+
 
 class CreateAccountActivity : AppCompatActivity() {
 
@@ -63,6 +65,8 @@ class CreateAccountActivity : AppCompatActivity() {
         lastName = etLastName?.text.toString()
         email = etEmail?.text.toString()
         password = etPassword?.text.toString()
+
+        addUserSharedPreferences(email.toString(),password.toString())
 
         if (!TextUtils.isEmpty(firstName) && !TextUtils.isEmpty(lastName)
             && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)
@@ -122,6 +126,18 @@ class CreateAccountActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun addUserSharedPreferences(mail: String, password: String) {
+        val mail_alias = "mail" + mail
+        val password_alias = "password" + password
+
+        val sp = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
+        val editor = sp.edit()
+        editor.putString(mail_alias, mail)
+        editor.putString(password_alias,password)
+        editor.commit()
+        Log.d("Oui", "Création oui")
     }
 
 }
