@@ -1,37 +1,27 @@
 package com.isen.secumobileisen
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
+
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.list_layout.*
-import kotlinx.android.synthetic.main.list_layout.view.*
 import java.security.KeyStore
 import java.util.*
-import java.util.jar.Attributes
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 
 class MainActivity : AppCompatActivity() {
@@ -122,11 +112,11 @@ class MainActivity : AppCompatActivity() {
 
     private inner class ProductFirestoreRecyclerAdapter internal constructor(options: FirestoreRecyclerOptions<Patients>) : FirestoreRecyclerAdapter<Patients, PatientViewHolder>(options) {
         override fun onBindViewHolder(productViewHolder: PatientViewHolder, position: Int, patients: Patients) {
-            var name = decrypt(patients.name)
-            var patho = decrypt(patients.pathology)
-            var traitement = decrypt(patients.treatments)
-            var description = decrypt(patients.today)
-            var dateVisite = decrypt(patients.date)
+            val name = decrypt(patients.name)
+            val patho = decrypt(patients.pathology)
+            val traitement = decrypt(patients.treatments)
+            val description = decrypt(patients.today)
+            val dateVisite = decrypt(patients.date)
 
             productViewHolder.setPatientName(name.toString())
             productViewHolder.setPatientDate(patho.toString())
@@ -162,17 +152,14 @@ class MainActivity : AppCompatActivity() {
             keyStore.load(null)
 
             val secretKey = (keyStore.getEntry(
-                "pkpas",
+                "ouin",
                 null
             ) as KeyStore.SecretKeyEntry).secretKey
 
-            val IV = "jdetestelekotlin"
-            val ivParameterSpec = IvParameterSpec(IV.toByteArray())
-
             val cipher =
-                Cipher.getInstance("AES/CBC/PKCS7Padding")
+                Cipher.getInstance("AES/ECB/NoPadding")
 
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
             return Base64.getEncoder()
                 .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
         } catch (e: Exception) {
@@ -187,14 +174,13 @@ class MainActivity : AppCompatActivity() {
             keyStore.load(null)
 
             val secretKey = (keyStore.getEntry(
-                "pkpas",
+                "ouin",
                 null
             ) as KeyStore.SecretKeyEntry).secretKey
 
-            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            val cipher = Cipher.getInstance("AES/ECB/NoPadding")
 
-            val ivParameterSpec = IvParameterSpec(cipher.iv)
-                cipher.init(Cipher.DECRYPT_MODE, secretKey,ivParameterSpec )
+            cipher.init(Cipher.DECRYPT_MODE, secretKey)
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")

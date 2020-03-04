@@ -16,13 +16,10 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.activity_list.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.list_layout.*
 import kotlinx.android.synthetic.main.listpatients_layout.*
+import java.security.KeyStore
 import java.util.*
 import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 class ListActivity : AppCompatActivity() {
 
@@ -85,7 +82,7 @@ class ListActivity : AppCompatActivity() {
 
 
         override fun onClick(v: View) {
-            db.collection("listpatients").document(encrypt(listPName.text.toString(),key).toString())
+            db.collection("listpatients").document(encrypt(listPName.text.toString()).toString())
                 .delete()
                 .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
                 .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
@@ -98,10 +95,9 @@ class ListActivity : AppCompatActivity() {
 
     private inner class ProductFirestoreRecyclerAdapter internal constructor(options: FirestoreRecyclerOptions<Patients>) : FirestoreRecyclerAdapter<Patients, PatientViewHolder>(options) {
         override fun onBindViewHolder(productViewHolder: PatientViewHolder, position: Int, patients: Patients) {
-            var name = decrypt(patients.name,key)
+            var name = decrypt(patients.name)
 
             productViewHolder.setPatientName(name.toString())
-            //productViewHolder.setPatientImage(patients.image)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientViewHolder {
@@ -124,18 +120,20 @@ class ListActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun encrypt(strToEncrypt: String, secret: String): String? {
+    fun encrypt(strToEncrypt: String): String? {
         try {
-            var key: ByteArray
-            key = secret.toByteArray()
-            key = Arrays.copyOf(key, 16)
-            var secretKey = SecretKeySpec(key, "AES")
-            var iv = "jdetestelekotlin"
-            val ivParam = IvParameterSpec(iv.toByteArray())
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+
+            val secretKey = (keyStore.getEntry(
+                "ouin",
+                null
+            ) as KeyStore.SecretKeyEntry).secretKey
 
             val cipher =
-                Cipher.getInstance("AES/CBC/PKCS5Padding")
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParam)
+                Cipher.getInstance("AES/ECB/NoPadding")
+
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
             return Base64.getEncoder()
                 .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
         } catch (e: Exception) {
@@ -144,18 +142,19 @@ class ListActivity : AppCompatActivity() {
         return null
     }
 
-    fun decrypt(strToDecrypt: String?, secret: String): String? {
+    fun decrypt(strToDecrypt: String?): String? {
         try {
-            var key: ByteArray
-            key = secret.toByteArray()
-            key = Arrays.copyOf(key, 16)
-            var secretKey = SecretKeySpec(key, "AES")
-            var iv = "jdetestelekotlin"
-            val ivParam = IvParameterSpec(iv.toByteArray())
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
 
-            val cipher =
-                Cipher.getInstance("AES/CBC/PKCS5Padding")
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParam)
+            val secretKey = (keyStore.getEntry(
+                "ouin",
+                null
+            ) as KeyStore.SecretKeyEntry).secretKey
+
+            val cipher = Cipher.getInstance("AES/ECB/NoPadding")
+
+            cipher.init(Cipher.DECRYPT_MODE, secretKey)
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")

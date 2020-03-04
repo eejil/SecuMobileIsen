@@ -119,23 +119,28 @@ class FormActivity : AppCompatActivity() {
             keyStore.load(null)
 
             val secretKey = (keyStore.getEntry(
-                "OuiOuiNon",
+                "ouin",
                 null
             ) as KeyStore.SecretKeyEntry).secretKey
 
 
-            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            val cipher = Cipher.getInstance("AES/ECB/NoPadding")
+
+            var temp = strToEncrypt
+            while (temp.toByteArray().size % 16 != 0)
+                temp += "\u0020"
 
 
             cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-            //return getEncoder()
-            //   .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
-            val cipheredString = getEncoder().encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
+            return getEncoder().encodeToString(cipher.doFinal(temp.toByteArray(charset("UTF-8"))))
+            /*val cipheredString = getEncoder().encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
 
             val ivParameterSpec = IvParameterSpec(cipher.iv)
             cipher.init(Cipher.DECRYPT_MODE, secretKey,ivParameterSpec )
             val decipheredString = String(cipher.doFinal(Base64.getDecoder().decode(cipheredString)))
             Log.d("Pourquoi ça marche pas?", decipheredString)
+
+             */
 
 
         } catch (e: Exception) {

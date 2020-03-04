@@ -108,11 +108,7 @@ class LoginActivity : AppCompatActivity() {
 
     fun generateSymmetricKey(keyAlias: String): Key {
 
-        val IV = "jdetestelekotlin"
-        val ivParameterSpec = IvParameterSpec(IV.toByteArray())
-
-
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
+        /*val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
         if (!keyStore.containsAlias(keyAlias)) {
             val keyGenParameterSpec =
@@ -128,7 +124,29 @@ class LoginActivity : AppCompatActivity() {
             val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
             keyGenerator.init(keyGenParameterSpec)
             return keyGenerator.generateKey()
+            }
+            */
+
+        val keyStore = KeyStore.getInstance("AndroidKeyStore")
+        keyStore.load(null)
+        if (!keyStore.containsAlias(keyAlias)) {
+
+            val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+                keyAlias,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_ECB)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setRandomizedEncryptionRequired(false)
+                .build()
+
+            val keyGenerator =
+                KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
+            keyGenerator.init(keyGenParameterSpec)
+            return keyGenerator.generateKey()
         }
+
+
 
         else {
             Log.d("LoginActiivty", "Non")
