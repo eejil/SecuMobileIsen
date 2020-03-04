@@ -26,6 +26,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.list_layout.*
 import kotlinx.android.synthetic.main.list_layout.view.*
+import java.security.KeyStore
 import java.util.*
 import java.util.jar.Attributes
 import javax.crypto.Cipher
@@ -38,7 +39,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var recycler_view: RecyclerView
     private var adapter: ProductFirestoreRecyclerAdapter? = null
     private val db = FirebaseFirestore.getInstance()
-    val key = "jdtestelekotlin"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onClick(v: View) {
-            db.collection("patients").document(encrypt(patientName.text.toString(),key).toString())
+            db.collection("patients").document(encrypt(patientName.text.toString()).toString())
                 .delete()
                 .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
                 .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
@@ -122,11 +122,11 @@ class MainActivity : AppCompatActivity() {
 
     private inner class ProductFirestoreRecyclerAdapter internal constructor(options: FirestoreRecyclerOptions<Patients>) : FirestoreRecyclerAdapter<Patients, PatientViewHolder>(options) {
         override fun onBindViewHolder(productViewHolder: PatientViewHolder, position: Int, patients: Patients) {
-            var name = decrypt(patients.name,key)
-            var patho = decrypt(patients.pathology,key)
-            var traitement = decrypt(patients.treatments,key)
-            var description = decrypt(patients.today,key)
-            var dateVisite = decrypt(patients.date,key)
+            var name = decrypt(patients.name)
+            var patho = decrypt(patients.pathology)
+            var traitement = decrypt(patients.treatments)
+            var description = decrypt(patients.today)
+            var dateVisite = decrypt(patients.date)
 
             productViewHolder.setPatientName(name.toString())
             productViewHolder.setPatientDate(patho.toString())
@@ -156,18 +156,23 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun encrypt(strToEncrypt: String, secret: String): String? {
+    fun encrypt(strToEncrypt: String): String? {
         try {
-            var key: ByteArray
-            key = secret.toByteArray()
-            key = Arrays.copyOf(key, 16)
-            var secretKey = SecretKeySpec(key, "AES")
-            var iv = "jdetestelekotlin"
-            val ivParam = IvParameterSpec(iv.toByteArray())
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+
+            val secretKey = (keyStore.getEntry(
+                "pkpas",
+                null
+            ) as KeyStore.SecretKeyEntry).secretKey
+
+            val IV = "jdetestelekotlin"
+            val ivParameterSpec = IvParameterSpec(IV.toByteArray())
 
             val cipher =
-                Cipher.getInstance("AES/CBC/PKCS5Padding")
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParam)
+                Cipher.getInstance("AES/CBC/PKCS7Padding")
+
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
             return Base64.getEncoder()
                 .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
         } catch (e: Exception) {
@@ -176,18 +181,20 @@ class MainActivity : AppCompatActivity() {
         return null
     }
 
-    fun decrypt(strToDecrypt: String?, secret: String): String? {
+    fun decrypt(strToDecrypt: String?): String? {
         try {
-            var key: ByteArray
-            key = secret.toByteArray()
-            key = Arrays.copyOf(key, 16)
-            var secretKey = SecretKeySpec(key, "AES")
-            var iv = "jdetestelekotlin"
-            val ivParam = IvParameterSpec(iv.toByteArray())
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
 
-            val cipher =
-                Cipher.getInstance("AES/CBC/PKCS5Padding")
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParam)
+            val secretKey = (keyStore.getEntry(
+                "pkpas",
+                null
+            ) as KeyStore.SecretKeyEntry).secretKey
+
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+
+            val ivParameterSpec = IvParameterSpec(cipher.iv)
+                cipher.init(Cipher.DECRYPT_MODE, secretKey,ivParameterSpec )
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")
@@ -198,7 +205,4 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
     }
-
-
-
 }

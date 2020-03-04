@@ -9,12 +9,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_form.*
+import java.security.KeyStore
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Base64.getEncoder
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 
 class FormActivity : AppCompatActivity() {
@@ -80,7 +80,6 @@ class FormActivity : AppCompatActivity() {
     }
 
     private fun setPatient(): Patients {
-        val key = "jdtestelekotlin"
         var name: String?
         var patho: String?
         var traitement: String?
@@ -92,11 +91,11 @@ class FormActivity : AppCompatActivity() {
         description = this.txt_today.editableText.toString()
         dateVisite = textview_date.let { it?.text.toString() }
 
-        name = encrypt(name, key)
-        patho = encrypt(patho, key)
-        traitement = encrypt(traitement, key)
-        description = encrypt(description, key)
-        dateVisite = encrypt(dateVisite, key)
+        name = encrypt(name)
+        patho = encrypt(patho)
+        traitement = encrypt(traitement)
+        description = encrypt(description)
+        dateVisite = encrypt(dateVisite)
 
         var newPatient =
             Patients(
@@ -114,20 +113,31 @@ class FormActivity : AppCompatActivity() {
     }
 
 
-    fun encrypt(strToEncrypt: String, secret: String): String? {
+    fun encrypt(strToEncrypt: String): String? {
         try {
-            var key: ByteArray
-            key = secret.toByteArray()
-            key = Arrays.copyOf(key, 16)
-            var secretKey = SecretKeySpec(key, "AES")
-            var iv = "jdetestelekotlin"
-            val ivParam = IvParameterSpec(iv.toByteArray())
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
 
-            val cipher =
-                Cipher.getInstance("AES/CBC/PKCS5Padding")
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParam)
-            return getEncoder()
-                .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
+            val secretKey = (keyStore.getEntry(
+                "OuiOuiNon",
+                null
+            ) as KeyStore.SecretKeyEntry).secretKey
+
+
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+
+
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+            //return getEncoder()
+            //   .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
+            val cipheredString = getEncoder().encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
+
+            val ivParameterSpec = IvParameterSpec(cipher.iv)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey,ivParameterSpec )
+            val decipheredString = String(cipher.doFinal(Base64.getDecoder().decode(cipheredString)))
+            Log.d("Pourquoi ça marche pas?", decipheredString)
+
+
         } catch (e: Exception) {
             println("Error while encrypting: $e")
         }
