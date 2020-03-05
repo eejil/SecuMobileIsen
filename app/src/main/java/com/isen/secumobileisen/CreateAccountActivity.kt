@@ -137,6 +137,8 @@ class CreateAccountActivity : AppCompatActivity() {
         val mail_alias = "mail" + mail
         val password_alias = "password" + password
 
+        //TODO: SharedPref
+        //val sp = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
         val sp = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
         val editor = sp.edit()
         editor.putString(mail_alias, mail)
