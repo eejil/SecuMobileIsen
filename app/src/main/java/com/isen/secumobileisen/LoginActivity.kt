@@ -15,7 +15,6 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.text.TextUtils
 import android.util.Base64
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
