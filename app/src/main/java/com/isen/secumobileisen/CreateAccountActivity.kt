@@ -4,11 +4,8 @@ import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import android.text.TextUtils
 import android.util.Log
-import android.view.KeyCharacterMap
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -17,11 +14,6 @@ import androidx.security.crypto.MasterKeys
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import java.security.Key
-import java.security.KeyStore
-import javax.crypto.KeyGenerator
-import javax.crypto.spec.IvParameterSpec
-
 class CreateAccountActivity : AppCompatActivity() {
 
     //UI elements
@@ -44,8 +36,6 @@ class CreateAccountActivity : AppCompatActivity() {
     private var email: String? = null
     private var password: String? = null
 
-    val ANDROID_KEY_STORE = "AndroidKeyStore"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_account)
@@ -63,7 +53,7 @@ class CreateAccountActivity : AppCompatActivity() {
         mProgressBar = ProgressDialog(this)
         mDatabase = FirebaseDatabase.getInstance()
         FirebaseDatabase.getInstance().setPersistenceEnabled(true)
-        mDatabaseReference = mDatabase!!.reference!!.child("Users")
+        mDatabaseReference = mDatabase!!.reference.child("Users")
         mAuth = FirebaseAuth.getInstance()
         btnCreateAccount!!.setOnClickListener { createNewAccount() }
     }
@@ -90,7 +80,7 @@ class CreateAccountActivity : AppCompatActivity() {
                         val userId = mAuth!!.currentUser!!.uid
                         //Verify Email
                         verifyEmail()
-                        //Create key and put it in keyStore
+                        //Create the secret key of the encrypted sharedPref and put it in keyStore
                         MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
                         //update user profile information
                         val currentUserDb = mDatabaseReference!!.child(userId)
@@ -139,72 +129,4 @@ class CreateAccountActivity : AppCompatActivity() {
                 }
             }
     }
-
-    /*private fun createKey(){
-        val ks = KeyStore.getInstance(KeyStore.getDefaultType())
-
-        FileInputStream("keyStore").use({ fis -> ks.load(fis, null) })
-
-        val protParam = KeyStore.PasswordProtection("Je n'aime pas le kotlin".toCharArray())
-
-        val localKey = KeyGenerator.getInstance("AES").generateKey()
-        val skEntry = KeyStore.SecretKeyEntry(localKey)
-        ks.setEntry("localKey", skEntry, protParam)
-    }
-
-    public fun generateSecretKey(keyAlias: String): SecretKey {
-        val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
-        val spec = KeyGenParameterSpec.Builder(keyAlias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-            .setRandomizedEncryptionRequired(false)
-            .build()
-
-        keyGenerator.init(spec)
-        return keyGenerator.generateKey()
-    }*/
-
-    fun generateSymmetricKey(keyAlias: String): Key {
-
-        val IV = "jdetestelekotlin"
-        val ivParameterSpec = IvParameterSpec(IV.toByteArray())
-
-
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-        if (!keyStore.containsAlias(keyAlias)) {
-            val keyGenParameterSpec =
-                KeyGenParameterSpec.Builder(
-                    keyAlias,
-                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-                )
-                    .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                    .setKeySize(128)
-                    .setRandomizedEncryptionRequired(false)
-                    .build()
-            val keyGenerator =
-                KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
-            keyGenerator.init(keyGenParameterSpec)
-            Log.d("LoginActiivty", "Okep")
-            return keyGenerator.generateKey()
-        } else {
-            Log.d("LoginActiivty", "Nope")
-
-        }
-        return keyStore.getKey(keyAlias, null)
-    }
-
-    fun getGeneratedKey(keyAlias: String) {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-
-        val secretKey = (keyStore.getEntry(
-            keyAlias,
-            null
-        ) as KeyStore.SecretKeyEntry).secretKey
-
-        Log.d("Pourquoi ça marche pas?", secretKey.toString())
-    }
-
 }
