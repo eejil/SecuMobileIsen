@@ -1,5 +1,6 @@
 package com.isen.secumobileisen
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
@@ -34,12 +35,6 @@ class FormActivity : AppCompatActivity() {
         btn_date.setOnClickListener {
             addPatientToFirestore(setPatient())
         }
-    }
-
-    fun docReference() { // [START doc_reference]
-        val alovelaceDocumentRef =
-            db.collection("users").document("alovelace")
-        // [END doc_reference]
     }
 
     private fun choixDate() {
@@ -119,12 +114,34 @@ class FormActivity : AppCompatActivity() {
             keyStore.load(null)
 
             val secretKey = (keyStore.getEntry(
-                "ouin",
+                "venotbg",
                 null
             ) as KeyStore.SecretKeyEntry).secretKey
 
+            val Iv = "jdetestelekotlin"
+            val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val cipher = Cipher.getInstance("AES/ECB/NoPadding")
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.ENCRYPT_MODE,secretKey, IvParameterSpec)
+            val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
+
+            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
+            val doc_alias = "alias" + getEncoder().encodeToString(cipherText)
+            val iv = cipher.iv.toString()
+            Log.d("Alias", doc_alias)
+            Log.d("iv", iv)
+
+            val editor = db.edit()
+            editor.putString(doc_alias,iv)
+            editor.commit()
+
+            return getEncoder().encodeToString(cipherText)
+
+
+
+
+
+            /*val cipher = Cipher.getInstance("AES/ECB/NoPadding")
 
             var temp = strToEncrypt
             while (temp.toByteArray().size % 16 != 0)
@@ -132,7 +149,7 @@ class FormActivity : AppCompatActivity() {
 
 
             cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-            return getEncoder().encodeToString(cipher.doFinal(temp.toByteArray(charset("UTF-8"))))
+            return getEncoder().encodeToString(cipher.doFinal(temp.toByteArray(charset("UTF-8"))))*/
             /*val cipheredString = getEncoder().encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
 
             val ivParameterSpec = IvParameterSpec(cipher.iv)
