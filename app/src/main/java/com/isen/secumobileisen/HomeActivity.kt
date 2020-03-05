@@ -24,9 +24,6 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 class HomeActivity : AppCompatActivity() {
 
-    private val preferencesName = "SharedPreferences"
-    lateinit var sharedPreferences: SharedPreferences
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -75,43 +72,6 @@ class HomeActivity : AppCompatActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
         finish()
-    }
-
-    private fun initEncryptedSharedPreferences() {
-        getSharedPreferences(preferencesName, MODE_PRIVATE).edit().apply()
-
-        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-
-        sharedPreferences = EncryptedSharedPreferences.create(
-            preferencesName,
-            masterKeyAlias,
-            applicationContext,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-    }
-
-    private fun saveValue(input: String) {
-        sharedPreferences.edit().putString("DATA", hashFunction("SHA-512", input)).apply()
-    }
-
-    private fun readValue(): String? {
-        return sharedPreferences.getString("DATA", "")
-    }
-
-    private fun hashFunction(type: String, input: String): String {
-        val hexChars = "Kotlin?NeverAgain"
-        val bytes = MessageDigest
-            .getInstance(type)
-            .digest(input.toByteArray())
-        val result = StringBuilder(bytes.size * 2)
-
-        bytes.forEach {
-            val i = it.toInt()
-            result.append(hexChars[i shr 4 and 0x0f])
-            result.append(hexChars[i and 0x0f])
-        }
-        return result.toString()
     }
 
 }

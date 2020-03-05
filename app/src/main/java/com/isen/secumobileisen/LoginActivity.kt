@@ -264,7 +264,6 @@ class LoginActivity : AppCompatActivity() {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
-
     private fun askNetworkPermission() {
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -314,6 +313,7 @@ class LoginActivity : AppCompatActivity() {
             mySnackbar2.show()
         }
     }*/
+
     private fun goodInstaller(): Boolean {
         val installer: String? = this.packageManager.getInstallerPackageName(this.packageName)
         return installer != null && installer.startsWith("com.android.vending")
@@ -328,11 +328,6 @@ class LoginActivity : AppCompatActivity() {
                 val md: MessageDigest = MessageDigest.getInstance("SHA-512")
                 md.update(signature.toByteArray())
                 val currentSignature: String = Base64.encodeToString(md.digest(), Base64.DEFAULT)
-
-                Log.d(
-                    "REMOVEME",
-                    "Include this string as a value for SIGNATURE:" + currentSignature
-                )
 
                 return currentSignature
             }

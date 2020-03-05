@@ -3,6 +3,7 @@ package com.isen.secumobileisen
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -10,9 +11,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.security.MessageDigest
 
 
 class CreateAccountActivity : AppCompatActivity() {
@@ -35,6 +39,11 @@ class CreateAccountActivity : AppCompatActivity() {
     private var lastName: String? = null
     private var email: String? = null
     private var password: String? = null
+
+    //Encrypted shared pref
+    private val preferencesName = "SharedPreferences"
+    lateinit var sharedPreferences: SharedPreferences
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +72,9 @@ class CreateAccountActivity : AppCompatActivity() {
         lastName = etLastName?.text.toString()
         email = etEmail?.text.toString()
         password = etPassword?.text.toString()
+
+        initEncryptedSharedPreferences()
+        saveValue(email.toString(),password.toString())
 
         addUserSharedPreferences(email.toString(),password.toString())
 
@@ -131,6 +143,32 @@ class CreateAccountActivity : AppCompatActivity() {
         editor.putString(password_alias,password)
         editor.commit()
 
+    }
+
+    private fun initEncryptedSharedPreferences() {
+        getSharedPreferences(preferencesName, MODE_PRIVATE).edit().apply()
+
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+
+        sharedPreferences = EncryptedSharedPreferences.create(
+            preferencesName,
+            masterKeyAlias,
+            applicationContext,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+
+    private fun saveValue(mail: String, pass: String) {
+        val mail_alias = "mail" + mail
+        val password_alias = "password" + pass
+
+        sharedPreferences.edit().putString(mail_alias, mail).apply()
+        sharedPreferences.edit().putString(password_alias, pass).apply()
+    }
+
+    private fun readValue(): String? {
+        return sharedPreferences.getString("DATA", "")
     }
 
 }
