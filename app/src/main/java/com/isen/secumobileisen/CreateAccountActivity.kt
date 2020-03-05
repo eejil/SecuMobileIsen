@@ -138,6 +138,7 @@ class CreateAccountActivity : AppCompatActivity() {
         editor.putString(password_alias,password)
         editor.commit()
         Log.d("Oui", "Création oui")
+
     }
 
 }

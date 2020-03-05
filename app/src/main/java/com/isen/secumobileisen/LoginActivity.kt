@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -47,6 +48,8 @@ class LoginActivity : AppCompatActivity() {
     private var keyAES = generateSymmetricKey("keyAES")
 
     private var NETWORK_PERMISSION = 10
+    private var INTERNET_PERMISSION = 20
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,7 +162,8 @@ class LoginActivity : AppCompatActivity() {
 
     fun generateSymmetricKey(keyAlias: String): Key {
 
-        /*val keyStore = KeyStore.getInstance("AndroidKeyStore")
+
+        val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
         if (!keyStore.containsAlias(keyAlias)) {
             val keyGenParameterSpec =
@@ -169,15 +173,16 @@ class LoginActivity : AppCompatActivity() {
                 )
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                    .setKeySize(128)
                     .setRandomizedEncryptionRequired(false)
                     .build()
             val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
             keyGenerator.init(keyGenParameterSpec)
             return keyGenerator.generateKey()
             }
-            */
 
+
+
+        /*
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
         if (!keyStore.containsAlias(keyAlias)) {
@@ -195,7 +200,11 @@ class LoginActivity : AppCompatActivity() {
                 KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
             keyGenerator.init(keyGenParameterSpec)
             return keyGenerator.generateKey()
-        }
+            }
+         */
+
+
+
 
 
 
@@ -254,6 +263,34 @@ class LoginActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.ACCESS_NETWORK_STATE),
                     NETWORK_PERMISSION)
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+        }
+
+    }
+
+    private fun askInternetPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.INTERNET)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.INTERNET),
+                    INTERNET_PERMISSION)
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the

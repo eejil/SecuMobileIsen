@@ -1,13 +1,12 @@
 package com.isen.secumobileisen
 
-import android.content.Intent
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,9 +14,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.list_layout.*
+import java.security.KeyStore
 import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
@@ -28,11 +25,11 @@ class HistoActivity : AppCompatActivity() {
     lateinit var recycler_view: RecyclerView
     private var adapter: ProductFirestoreRecyclerAdapter? = null
     private val db = FirebaseFirestore.getInstance()
-    val key = "jdtestelekotlin"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_histo)
+
 
         val query = db!!.collection("histopatients").orderBy("name", Query.Direction.ASCENDING)
 
@@ -83,11 +80,11 @@ class HistoActivity : AppCompatActivity() {
 
     private inner class ProductFirestoreRecyclerAdapter internal constructor(options: FirestoreRecyclerOptions<Patients>) : FirestoreRecyclerAdapter<Patients, ProductViewHolder>(options) {
         override fun onBindViewHolder(productViewHolder: ProductViewHolder, position: Int, patients: Patients) {
-            var name = decrypt(patients.name,key)
-            var patho = decrypt(patients.pathology,key)
-            var traitement = decrypt(patients.treatments,key)
-            var description = decrypt(patients.today,key)
-            var dateVisite = decrypt(patients.date,key)
+            var name = decrypt(patients.name)
+            var patho = decrypt(patients.pathology)
+            var traitement = decrypt(patients.treatments)
+            var description = decrypt(patients.today)
+            var dateVisite = decrypt(patients.date)
 
             productViewHolder.setPatientName(name.toString())
             productViewHolder.setPatientDate(patho.toString())
@@ -124,18 +121,28 @@ class HistoActivity : AppCompatActivity() {
         return null
     }
 
-    fun decrypt(strToDecrypt: String?, secret: String): String? {
+    fun decrypt(strToDecrypt: String?): String? {
         try {
-            var key: ByteArray
-            key = secret.toByteArray()
-            key = Arrays.copyOf(key, 16)
-            var secretKey = SecretKeySpec(key, "AES")
-            var iv = "jdetestelekotlin"
-            val ivParam = IvParameterSpec(iv.toByteArray())
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
 
-            val cipher =
-                Cipher.getInstance("AES/CBC/PKCS5Padding")
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParam)
+            val secretKey = (keyStore.getEntry(
+                "venotbg",
+                null
+            ) as KeyStore.SecretKeyEntry).secretKey
+
+            val Iv = "jdetestelekotlin"
+            val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
+
+            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
+            val doc_alias = "alias" + strToDecrypt
+            val iv = db.getString(doc_alias,"samarshpas").toString()
+            val ivParameterSpec = IvParameterSpec(iv.toByteArray())
+            Log.d("Alias", doc_alias)
+            Log.d("iv", iv)
+
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec)
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")
