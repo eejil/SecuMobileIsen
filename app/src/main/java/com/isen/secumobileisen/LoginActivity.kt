@@ -52,8 +52,6 @@ class LoginActivity : AppCompatActivity() {
     //Firebase references
     private var mAuth: FirebaseAuth? = null
 
-    private var keyAES = generateSymmetricKey("keyAES")
-
     private var NETWORK_PERMISSION = 10
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,11 +88,6 @@ class LoginActivity : AppCompatActivity() {
         initialise()
 
         //checkRooting()
-
-        /*btn_addK.setOnClickListener {
-            generateSymmetricKey(et_key.text.toString())
-        }
-       */
 
     }
 
@@ -156,17 +149,12 @@ class LoginActivity : AppCompatActivity() {
             if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
                 mProgressBar!!.setMessage("Registering User...")
                 mProgressBar!!.show()
-                Log.d(TAG, "Logging in user.")
                 mAuth!!.signInWithEmailAndPassword(email!!, password!!)
                     .addOnCompleteListener(this) { task ->
                         mProgressBar!!.hide()
                         if (task.isSuccessful) {
-                            // Sign in success, update UI with signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success")
                             updateUI()
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Log.e(TAG, "signInWithEmail:failure", task.exception)
                             Toast.makeText(
                                 this@LoginActivity, "Authentication failed.",
                                 Toast.LENGTH_SHORT
@@ -236,7 +224,11 @@ class LoginActivity : AppCompatActivity() {
                 KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
             keyGenerator.init(keyGenParameterSpec)
             return keyGenerator.generateKey()
-        } else {
+        }
+
+
+
+        else {
             Log.d("LoginActiivty", "Non")
 
         }

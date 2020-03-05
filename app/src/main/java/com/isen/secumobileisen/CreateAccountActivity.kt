@@ -5,7 +5,6 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -31,7 +30,6 @@ class CreateAccountActivity : AppCompatActivity() {
     private var mDatabase: FirebaseDatabase? = null
     private var mAuth: FirebaseAuth? = null
 
-    private val TAG = "CreateAccountActivity"
     //global variables
     private var firstName: String? = null
     private var lastName: String? = null
@@ -79,8 +77,6 @@ class CreateAccountActivity : AppCompatActivity() {
                 .addOnCompleteListener(this) { task ->
                     mProgressBar!!.hide()
                     if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "createUserWithEmail:success")
                         val userId = mAuth!!.currentUser!!.uid
                         //Verify Email
                         verifyEmail()
@@ -90,8 +86,6 @@ class CreateAccountActivity : AppCompatActivity() {
                         currentUserDb.child("lastName").setValue(lastName)
                         updateUserInfoAndUI()
                     } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "createUserWithEmail:failure", task.exception)
                         Toast.makeText(
                             this@CreateAccountActivity, "Authentication failed.",
                             Toast.LENGTH_SHORT
@@ -120,7 +114,6 @@ class CreateAccountActivity : AppCompatActivity() {
                         "Verification email sent to " + mUser.getEmail(),
                         Toast.LENGTH_SHORT).show()
                 } else {
-                    Log.e(TAG, "sendEmailVerification", task.exception)
                     Toast.makeText(this@CreateAccountActivity,
                         "Failed to send verification email.",
                         Toast.LENGTH_SHORT).show()
@@ -137,7 +130,6 @@ class CreateAccountActivity : AppCompatActivity() {
         editor.putString(mail_alias, mail)
         editor.putString(password_alias,password)
         editor.commit()
-        Log.d("Oui", "Création oui")
 
     }
 

@@ -1,6 +1,5 @@
 package com.isen.secumobileisen
 
-import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
@@ -16,11 +15,14 @@ import java.util.*
 import java.util.Base64.getEncoder
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import kotlin.collections.HashMap
+import kotlin.collections.set
 
 
 class FormActivity : AppCompatActivity() {
 
-    /*var textview_date: TextView? = null
+    var textview_date: TextView? = null
     var cal = Calendar.getInstance()
 
     var cloudFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -121,44 +123,15 @@ class FormActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
+            val key ="azertyuiopazerty"
+            val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
+
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.ENCRYPT_MODE,secretKey, IvParameterSpec)
+            cipher.init(Cipher.ENCRYPT_MODE,skeySpec, IvParameterSpec)
             val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
 
-            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
-            val doc_alias = "alias" + getEncoder().encodeToString(cipherText)
-            val iv = cipher.iv.toString()
-            Log.d("Alias", doc_alias)
-            Log.d("iv", iv)
-
-            val editor = db.edit()
-            editor.putString(doc_alias,iv)
-            editor.commit()
 
             return getEncoder().encodeToString(cipherText)
-
-
-
-
-
-            /*val cipher = Cipher.getInstance("AES/ECB/NoPadding")
-
-            var temp = strToEncrypt
-            while (temp.toByteArray().size % 16 != 0)
-                temp += "\u0020"
-
-
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-            return getEncoder().encodeToString(cipher.doFinal(temp.toByteArray(charset("UTF-8"))))*/
-            /*val cipheredString = getEncoder().encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
-
-            val ivParameterSpec = IvParameterSpec(cipher.iv)
-            cipher.init(Cipher.DECRYPT_MODE, secretKey,ivParameterSpec )
-            val decipheredString = String(cipher.doFinal(Base64.getDecoder().decode(cipheredString)))
-            Log.d("Pourquoi ça marche pas?", decipheredString)
-
-             */
-
 
         } catch (e: Exception) {
             println("Error while encrypting: $e")
@@ -169,12 +142,8 @@ class FormActivity : AppCompatActivity() {
     private fun addPatientToFirestore(newPatient: Patients) {
         cloudFirestore.collection("patients").document(newPatient.name)
             .set(newPatient)
-            .addOnSuccessListener { Log.d("Success :", "DocumentSnapshot successfully written!") }
-            .addOnFailureListener { e -> Log.w("Error :", "Error writing document", e) }
         cloudFirestore.collection("histopatients").document(newPatient.name)
             .set(newPatient)
-            .addOnSuccessListener { Log.d("Success :", "DocumentSnapshot successfully written!") }
-            .addOnFailureListener { e -> Log.w("Error :", "Error writing document", e) }
 
         // [START get_document]
         db.collection("listpatients")
@@ -184,10 +153,6 @@ class FormActivity : AppCompatActivity() {
                     var i = 0
                     var cant_write = false
                     for (document in task.result!!) {
-                        Log.d(
-                            "FormActivity",
-                            document.id + " => " + document.data
-                        )
                         if (newPatient.name == document.data.getValue("name")) {
                             cant_write = true
                         }
@@ -200,8 +165,6 @@ class FormActivity : AppCompatActivity() {
                         data["name"] = newPatient.name
                         cloudFirestore.collection("listpatients").document(newPatient.name)
                             .set(data)
-                            .addOnSuccessListener { Log.d("Success :", "DocumentSnapshot successfully written!") }
-                            .addOnFailureListener { e -> Log.w("Error :", "Error writing document", e) }
                     }
                 }
 
@@ -211,11 +174,25 @@ class FormActivity : AppCompatActivity() {
                     data["name"] = newPatient.name
                     cloudFirestore.collection("listpatients").document(newPatient.name)
                         .set(data)
-                        .addOnSuccessListener { Log.d("Success :", "DocumentSnapshot successfully written!") }
-                        .addOnFailureListener { e -> Log.w("Error :", "Error writing document", e) }
                 }
             }
         // [END get_document]
-        }*/
+        }
+    private fun getMasterKey():String {
+        var masterKey = ""
+        val docRef =
+            cloudFirestore.collection("masterKey").document("masterKey")
+        docRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val document = task.result
+                if (document!!.exists()) {
+                    masterKey = document.data!!.getValue("name").toString()
+                }
+            }
+        }
+
+        return masterKey
     }
+}
+
 
