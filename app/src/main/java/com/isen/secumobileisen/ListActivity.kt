@@ -25,7 +25,7 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 class ListActivity : AppCompatActivity() {
-
+/*
     lateinit var recycler_view: RecyclerView
     private var adapter: ProductFirestoreRecyclerAdapter? = null
     private val db = FirebaseFirestore.getInstance()
@@ -167,6 +167,6 @@ class ListActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
 
-
+*/
 
 }

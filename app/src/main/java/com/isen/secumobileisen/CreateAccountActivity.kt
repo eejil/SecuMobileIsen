@@ -10,10 +10,10 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.security.crypto.MasterKeys
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+
 class CreateAccountActivity : AppCompatActivity() {
 
     //UI elements
@@ -53,7 +53,7 @@ class CreateAccountActivity : AppCompatActivity() {
         mProgressBar = ProgressDialog(this)
         mDatabase = FirebaseDatabase.getInstance()
         FirebaseDatabase.getInstance().setPersistenceEnabled(true)
-        mDatabaseReference = mDatabase!!.reference.child("Users")
+        mDatabaseReference = mDatabase!!.reference!!.child("Users")
         mAuth = FirebaseAuth.getInstance()
         btnCreateAccount!!.setOnClickListener { createNewAccount() }
     }
@@ -80,8 +80,6 @@ class CreateAccountActivity : AppCompatActivity() {
                         val userId = mAuth!!.currentUser!!.uid
                         //Verify Email
                         verifyEmail()
-                        //Create the secret key of the encrypted sharedPref and put it in keyStore
-                        MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
                         //update user profile information
                         val currentUserDb = mDatabaseReference!!.child(userId)
                         currentUserDb.child("firstName").setValue(firstName)
@@ -110,23 +108,20 @@ class CreateAccountActivity : AppCompatActivity() {
     }
 
     private fun verifyEmail() {
-        val mUser = mAuth?.currentUser
+        val mUser = mAuth!!.currentUser;
         mUser!!.sendEmailVerification()
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(
-                        this@CreateAccountActivity,
+                    Toast.makeText(this@CreateAccountActivity,
                         "Verification email sent to " + mUser.getEmail(),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        Toast.LENGTH_SHORT).show()
                 } else {
                     Log.e(TAG, "sendEmailVerification", task.exception)
-                    Toast.makeText(
-                        this@CreateAccountActivity,
+                    Toast.makeText(this@CreateAccountActivity,
                         "Failed to send verification email.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
 }

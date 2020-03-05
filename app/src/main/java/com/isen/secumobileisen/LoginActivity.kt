@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
     //global variables
     private var email: String? = null
     private var password: String? = null
-    private val SIGNATURE: String = ""
+    private val SIGNATURE: String = "HbiYuFB2kKyIs/VLWd92GjauJDceQxrMAnwI9dwJ9DU=\n"
     //UI elements
     private var tvForgotPassword: TextView? = null
     private var etEmail: EditText? = null

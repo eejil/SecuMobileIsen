@@ -91,8 +91,8 @@ class HomeActivity : AppCompatActivity() {
         )
     }
 
-    private fun saveValue() {
-        sharedPreferences.edit().putString("DATA", hashFunction("SHA-512", "")).apply()
+    private fun saveValue(input: String) {
+        sharedPreferences.edit().putString("DATA", hashFunction("SHA-512", input)).apply()
     }
 
     private fun readValue(): String? {
