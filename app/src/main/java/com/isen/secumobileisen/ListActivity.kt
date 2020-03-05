@@ -27,6 +27,8 @@ class ListActivity : AppCompatActivity() {
     lateinit var recycler_view: RecyclerView
     private var adapter: ProductFirestoreRecyclerAdapter? = null
     private val db = FirebaseFirestore.getInstance()
+    //Encrypted shared pref
+    private val preferencesName = "SharedPreferences"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,6 +136,8 @@ class ListActivity : AppCompatActivity() {
             cipher.init(Cipher.ENCRYPT_MODE,secretKey, IvParameterSpec)
             val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
 
+            //TODO: Change SharedPref
+            //val db = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
             val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
             val doc_alias = "alias" + Base64.getEncoder().encodeToString(cipherText)
             val iv = cipher.iv.toString()

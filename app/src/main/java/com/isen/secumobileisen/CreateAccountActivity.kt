@@ -167,8 +167,8 @@ class CreateAccountActivity : AppCompatActivity() {
         sharedPreferences.edit().putString(password_alias, pass).apply()
     }
 
-    private fun readValue(): String? {
-        return sharedPreferences.getString("DATA", "")
+    private fun readValue(sharedName: String): String? {
+        return sharedPreferences.getString(sharedName, "")
     }
 
 }

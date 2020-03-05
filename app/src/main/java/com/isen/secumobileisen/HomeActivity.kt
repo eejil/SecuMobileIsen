@@ -20,9 +20,17 @@ import java.security.MessageDigest
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import com.google.firebase.firestore.FirebaseFirestore
+import java.security.Key
+import java.security.KeyStore
+import javax.crypto.KeyGenerator
 
 
 class HomeActivity : AppCompatActivity() {
+
+    var cloudFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +51,9 @@ class HomeActivity : AppCompatActivity() {
         btn_logout.setOnClickListener {
             logout()
         }
+
+        //createMasterKey()
+        pushMasterKey()
     }
 
     private fun goToHisto() {
@@ -72,6 +83,37 @@ class HomeActivity : AppCompatActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
         finish()
+    }
+
+    fun createMasterKey() : Key {
+        val keyStore = KeyStore.getInstance("AndroidKeyStore")
+        keyStore.load(null)
+
+
+        val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+            "TheMasterKey",
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
+            .setBlockModes(KeyProperties.BLOCK_MODE_ECB)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .setRandomizedEncryptionRequired(false)
+            .build()
+
+        val keyGenerator =
+            KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
+        keyGenerator.init(keyGenParameterSpec)
+        return keyGenerator.generateKey()
+    }
+
+
+    fun pushMasterKey() {
+        val key  = "azertyuiopazerty"
+
+        val data: MutableMap<String, String> =
+            HashMap()
+        data["name"] = key
+        cloudFirestore.collection("masterKey").document("masterKey")
+            .set(data)
     }
 
 }

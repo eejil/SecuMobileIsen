@@ -26,7 +26,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-//import com.scottyab.rootbeer.RootBeer
+import com.scottyab.rootbeer.RootBeer
 import kotlinx.android.synthetic.main.activity_login.*
 import java.security.Key
 import java.security.KeyStore
@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
     //global variables
     private var email: String? = null
     private var password: String? = null
-    private val SIGNATURE: String = ""
+    private val SIGNATURE: String = "HbiYuFB2kKyIs/VLWd92GjauJDceQxrMAnwI9dwJ9DU=\n"
     //UI elements
     private var tvForgotPassword: TextView? = null
     private var etEmail: EditText? = null
@@ -52,6 +52,7 @@ class LoginActivity : AppCompatActivity() {
     //Firebase references
     private var mAuth: FirebaseAuth? = null
 
+    private val preferencesName = "SharedPreferences"
     private var NETWORK_PERMISSION = 10
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,14 +88,12 @@ class LoginActivity : AppCompatActivity() {
 
         initialise()
 
-        //checkRooting()
+        checkRooting()
 
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>, grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             NETWORK_PERMISSION -> {
                 // If request is cancelled, the result arrays are empty.
@@ -131,14 +130,8 @@ class LoginActivity : AppCompatActivity() {
         mProgressBar = ProgressDialog(this)
         mAuth = FirebaseAuth.getInstance()
         btnCreateAccount!!
-            .setOnClickListener {
-                startActivity(
-                    Intent(
-                        this@LoginActivity,
-                        CreateAccountActivity::class.java
-                    )
-                )
-            }
+            .setOnClickListener { startActivity(Intent(this@LoginActivity,
+                        CreateAccountActivity::class.java)) }
         btnLogin!!.setOnClickListener { loginUser() }
     }
 
@@ -226,12 +219,6 @@ class LoginActivity : AppCompatActivity() {
             return keyGenerator.generateKey()
         }
 
-
-
-        else {
-            Log.d("LoginActiivty", "Non")
-
-        }
         return keyStore.getKey(keyAlias, null)
     }
 
@@ -246,6 +233,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun checkSharedPreferences(mail: String, password: String): Boolean {
+        //TODO: SharedPref
+        //val db = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
         val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
         val mail_alias = "mail" + mail
         val password_alias = "password" + password
@@ -300,7 +289,7 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    /*private fun checkRooting(){
+    private fun checkRooting(){
 
         var rootBeer  = RootBeer(this)
 
@@ -312,7 +301,7 @@ class LoginActivity : AppCompatActivity() {
             val mySnackbar2 = Snackbar.make(mylayout, "appareil non-rooté", Snackbar.LENGTH_LONG)
             mySnackbar2.show()
         }
-    }*/
+    }
 
     private fun goodInstaller(): Boolean {
         val installer: String? = this.packageManager.getInstallerPackageName(this.packageName)
