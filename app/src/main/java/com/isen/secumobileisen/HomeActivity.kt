@@ -3,10 +3,20 @@ package com.isen.secumobileisen
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
+import java.security.Key
+import java.security.KeyStore
+import javax.crypto.KeyGenerator
 
+@Suppress("UNREACHABLE_CODE")
 class HomeActivity : AppCompatActivity() {
+
+    var cloudFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +37,9 @@ class HomeActivity : AppCompatActivity() {
         btn_logout.setOnClickListener {
             logout()
         }
+
+        //createMasterKey()
+        pushMasterKey()
     }
 
     private fun goToHisto() {
@@ -57,4 +70,40 @@ class HomeActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
+    fun createMasterKey() : Key {
+        val keyStore = KeyStore.getInstance("AndroidKeyStore")
+        keyStore.load(null)
+
+
+        val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+            "TheMasterKey",
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
+            .setBlockModes(KeyProperties.BLOCK_MODE_ECB)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .setRandomizedEncryptionRequired(false)
+            .build()
+
+        val keyGenerator =
+            KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
+        keyGenerator.init(keyGenParameterSpec)
+        return keyGenerator.generateKey()
+    }
+
+
+        fun pushMasterKey() {
+            val key  = "azertyuiopazerty"
+
+            val data: MutableMap<String, String> =
+                HashMap()
+            data["name"] = key
+            cloudFirestore.collection("masterKey").document("masterKey")
+                .set(data)
+        }
+
+
+
+
+
 }

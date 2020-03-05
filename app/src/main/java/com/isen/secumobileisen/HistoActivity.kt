@@ -3,7 +3,6 @@ package com.isen.secumobileisen
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,8 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import java.security.KeyStore
-import java.util.*
+import java.util.Arrays
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -80,18 +80,17 @@ class HistoActivity : AppCompatActivity() {
 
     private inner class ProductFirestoreRecyclerAdapter internal constructor(options: FirestoreRecyclerOptions<Patients>) : FirestoreRecyclerAdapter<Patients, ProductViewHolder>(options) {
         override fun onBindViewHolder(productViewHolder: ProductViewHolder, position: Int, patients: Patients) {
-            var name = decrypt(patients.name)
-            var patho = decrypt(patients.pathology)
-            var traitement = decrypt(patients.treatments)
-            var description = decrypt(patients.today)
-            var dateVisite = decrypt(patients.date)
+            val name = decrypt(patients.name)
+            val patho = decrypt(patients.pathology)
+            val traitement = decrypt(patients.treatments)
+            val description = decrypt(patients.today)
+            val dateVisite = decrypt(patients.date)
 
             productViewHolder.setPatientName(name.toString())
             productViewHolder.setPatientDate(patho.toString())
             productViewHolder.setPatientToday(traitement.toString())
             productViewHolder.setPatientPathology(description.toString())
             productViewHolder.setPatientTreatments(dateVisite.toString())
-            //productViewHolder.setPatientImage(patients.image)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -99,26 +98,6 @@ class HistoActivity : AppCompatActivity() {
 
             return ProductViewHolder(view)
         }
-    }
-
-    fun encrypt(strToEncrypt: String, secret: String): String? {
-        try {
-            var key: ByteArray
-            key = secret.toByteArray()
-            key = Arrays.copyOf(key, 16)
-            var secretKey = SecretKeySpec(key, "AES")
-            var iv = "jdetestelekotlin"
-            val ivParam = IvParameterSpec(iv.toByteArray())
-
-            val cipher =
-                Cipher.getInstance("AES/CBC/PKCS5Padding")
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParam)
-            return Base64.getEncoder()
-                .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
-        } catch (e: Exception) {
-            println("Error while encrypting: $e")
-        }
-        return null
     }
 
     fun decrypt(strToDecrypt: String?): String? {
@@ -131,26 +110,15 @@ class HistoActivity : AppCompatActivity() {
                 null
             ) as KeyStore.SecretKeyEntry).secretKey
 
-            val Iv = "jdetestelekotlin"
-            val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
-
-            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
-            val doc_alias = "alias" + strToDecrypt
-            val iv = db.getString(doc_alias,"samarshpas").toString()
+            val iv = "jdetestelekotlin"
             val ivParameterSpec = IvParameterSpec(iv.toByteArray())
-            Log.d("Alias", doc_alias)
-            Log.d("iv", iv)
 
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec)
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")
         }
         return null
-    }
-
-    companion object {
-        private const val TAG = "MainActivity"
     }
 }

@@ -4,7 +4,6 @@ package com.isen.secumobileisen
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,9 +19,10 @@ import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.list_layout.*
 import java.security.KeyStore
-import java.util.*
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 
 class MainActivity : AppCompatActivity() {
@@ -102,9 +102,6 @@ class MainActivity : AppCompatActivity() {
         override fun onClick(v: View) {
             db.collection("patients").document(encrypt(patientName.text.toString()).toString())
                 .delete()
-                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
-                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-            Log.d(TAG, "OUI")
             finish()
             startActivity(getIntent())
         }
@@ -167,37 +164,12 @@ class MainActivity : AppCompatActivity() {
             val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
             val doc_alias = "alias" + Base64.getEncoder().encodeToString(cipherText)
             val iv = cipher.iv.toString()
-            Log.d("Alias", doc_alias)
-            Log.d("iv", iv)
 
             val editor = db.edit()
             editor.putString(doc_alias,iv)
             editor.commit()
 
             return Base64.getEncoder().encodeToString(cipherText)
-
-
-
-
-
-            /*val cipher = Cipher.getInstance("AES/ECB/NoPadding")
-
-            var temp = strToEncrypt
-            while (temp.toByteArray().size % 16 != 0)
-                temp += "\u0020"
-
-
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-            return getEncoder().encodeToString(cipher.doFinal(temp.toByteArray(charset("UTF-8"))))*/
-            /*val cipheredString = getEncoder().encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
-
-            val ivParameterSpec = IvParameterSpec(cipher.iv)
-            cipher.init(Cipher.DECRYPT_MODE, secretKey,ivParameterSpec )
-            val decipheredString = String(cipher.doFinal(Base64.getDecoder().decode(cipheredString)))
-            Log.d("Pourquoi ça marche pas?", decipheredString)
-
-             */
-
 
         } catch (e: Exception) {
             println("Error while encrypting: $e")
@@ -218,15 +190,11 @@ class MainActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
-            val doc_alias = "alias" + strToDecrypt
-            val iv = db.getString(doc_alias,"samarshpas").toString()
-            val ivParameterSpec = IvParameterSpec(iv.toByteArray())
-            Log.d("Alias", doc_alias)
-            Log.d("iv", iv)
+            val key ="azertyuiopazerty"
+            val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
 
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec)
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec, IvParameterSpec)
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")

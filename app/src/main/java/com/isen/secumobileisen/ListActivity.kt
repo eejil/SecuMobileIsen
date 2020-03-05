@@ -1,9 +1,9 @@
 package com.isen.secumobileisen
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +18,9 @@ import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.activity_list.*
 import kotlinx.android.synthetic.main.listpatients_layout.*
 import java.security.KeyStore
-import java.util.*
+import java.util.Base64
 import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
 
 class ListActivity : AppCompatActivity() {
 
@@ -83,9 +84,6 @@ class ListActivity : AppCompatActivity() {
         override fun onClick(v: View) {
             db.collection("listpatients").document(encrypt(listPName.text.toString()).toString())
                 .delete()
-                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
-                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-            Log.d(TAG, "OUI")
             finish()
             startActivity(getIntent())
         }
@@ -125,16 +123,27 @@ class ListActivity : AppCompatActivity() {
             keyStore.load(null)
 
             val secretKey = (keyStore.getEntry(
-                "ouin",
+                "venotbg",
                 null
             ) as KeyStore.SecretKeyEntry).secretKey
 
-            val cipher =
-                Cipher.getInstance("AES/ECB/NoPadding")
+            val Iv = "jdetestelekotlin"
+            val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-            return Base64.getEncoder()
-                .encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))))
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.ENCRYPT_MODE,secretKey, IvParameterSpec)
+            val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
+
+            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
+            val doc_alias = "alias" + Base64.getEncoder().encodeToString(cipherText)
+            val iv = cipher.iv.toString()
+
+            val editor = db.edit()
+            editor.putString(doc_alias,iv)
+            editor.commit()
+
+            return Base64.getEncoder().encodeToString(cipherText)
+
         } catch (e: Exception) {
             println("Error while encrypting: $e")
         }
@@ -147,13 +156,15 @@ class ListActivity : AppCompatActivity() {
             keyStore.load(null)
 
             val secretKey = (keyStore.getEntry(
-                "ouin",
+                "venotbg",
                 null
             ) as KeyStore.SecretKeyEntry).secretKey
 
-            val cipher = Cipher.getInstance("AES/ECB/NoPadding")
+            val Iv = "jdetestelekotlin"
+            val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            cipher.init(Cipher.DECRYPT_MODE, secretKey)
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec)
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")

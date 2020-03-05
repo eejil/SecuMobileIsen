@@ -108,6 +108,7 @@
         android:layout_width="409dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="48dp"
+        android:focusedByDefault="true"
         app:layout_constraintBottom_toTopOf="@+id/txtinput_pathology"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
