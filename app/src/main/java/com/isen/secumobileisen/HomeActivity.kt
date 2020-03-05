@@ -22,13 +22,9 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
-
-
 class HomeActivity : AppCompatActivity() {
 
     private val preferencesName = "SharedPreferences"
-
-    // Step 0: EncryptedSharedPreferences take long to initialize/open, therefor it's better to do it only once and keep an instance
     lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,13 +77,11 @@ class HomeActivity : AppCompatActivity() {
         finish()
     }
 
-    /*private fun initEncryptedSharedPreferences() {
+    private fun initEncryptedSharedPreferences() {
         getSharedPreferences(preferencesName, MODE_PRIVATE).edit().apply()
 
-        // Step 1: Create or retrieve the Master Key for encryption/decryption
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 
-        // Step 2: Initialize/open an instance of EncryptedSharedPreferences
         sharedPreferences = EncryptedSharedPreferences.create(
             preferencesName,
             masterKeyAlias,
@@ -98,12 +92,27 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun saveValue() {
-        sharedPreferences.edit().putString("DATA", SIGNATURE).apply()
+        sharedPreferences.edit().putString("DATA", hashFunction("SHA-512", "")).apply()
     }
 
     private fun readValue(): String? {
         return sharedPreferences.getString("DATA", "")
-    }*/
+    }
+
+    private fun hashFunction(type: String, input: String): String {
+        val hexChars = "Kotlin?NeverAgain"
+        val bytes = MessageDigest
+            .getInstance(type)
+            .digest(input.toByteArray())
+        val result = StringBuilder(bytes.size * 2)
+
+        bytes.forEach {
+            val i = it.toInt()
+            result.append(hexChars[i shr 4 and 0x0f])
+            result.append(hexChars[i and 0x0f])
+        }
+        return result.toString()
+    }
 
 }
 

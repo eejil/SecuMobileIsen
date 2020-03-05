@@ -52,7 +52,14 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        initialise()
+        if(!goodInstaller()){
+            AlertDialog.Builder(this)
+                .setTitle("ATTENTION")
+                .setMessage("Votre application n'a pas été installée par un programme reconnu.")
+                .setNeutralButton("Ok") { _, _ -> }
+                .create()
+                .show()
+        }
 
         if(isEmulator()){
             AlertDialog.Builder(this)
@@ -62,7 +69,8 @@ class LoginActivity : AppCompatActivity() {
                 .create()
                 .show()
         }
-        if(!verifySignature()){
+
+        if(!goodSignature()){
             AlertDialog.Builder(this)
                 .setTitle("ATTENTION")
                 .setMessage("Votre application ne possède pas la signature du constructeur.")
@@ -70,6 +78,8 @@ class LoginActivity : AppCompatActivity() {
                 .create()
                 .show()
         }
+
+        initialise()
 
         /*btn_addK.setOnClickListener {
             generateSymmetricKey(et_key.text.toString())
@@ -172,7 +182,7 @@ class LoginActivity : AppCompatActivity() {
         return secretKey
     }
 
-    private fun verifyInstaller(): Boolean {
+    private fun goodInstaller(): Boolean {
         val installer: String? = this.packageManager.getInstallerPackageName(this.packageName)
         return installer != null && installer.startsWith("com.android.vending")
     }
@@ -201,12 +211,11 @@ class LoginActivity : AppCompatActivity() {
         return null
     }
 
-    private fun verifySignature(): Boolean {
+    private fun goodSignature(): Boolean {
         if (getCurrentSignature().equals(SIGNATURE)) {
             return true
         }
-        return true
-        //return false
+        return false
     }
 
     private fun isEmulator(): Boolean {
