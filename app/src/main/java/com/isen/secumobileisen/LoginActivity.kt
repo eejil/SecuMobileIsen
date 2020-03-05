@@ -1,11 +1,16 @@
 package com.isen.secumobileisen
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.text.TextUtils
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -15,8 +20,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
+import java.lang.Exception
 import java.security.Key
 import java.security.KeyStore
+import java.security.MessageDigest
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
@@ -28,6 +35,7 @@ class LoginActivity : AppCompatActivity() {
     //global variables
     private var email: String? = null
     private var password: String? = null
+    private val SIGNATURE: String = ""
     //UI elements
     private var tvForgotPassword: TextView? = null
     private var etEmail: EditText? = null
@@ -45,6 +53,23 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         initialise()
+
+        if(isEmulator()){
+            AlertDialog.Builder(this)
+                .setTitle("ATTENTION")
+                .setMessage("Votre application tourne sur un emulateur.")
+                .setNeutralButton("Ok") { _, _ -> }
+                .create()
+                .show()
+        }
+        if(!verifySignature()){
+            AlertDialog.Builder(this)
+                .setTitle("ATTENTION")
+                .setMessage("Votre application ne possède pas la signature du constructeur.")
+                .setNeutralButton("Ok") { _, _ -> }
+                .create()
+                .show()
+        }
 
         /*btn_addK.setOnClickListener {
             generateSymmetricKey(et_key.text.toString())
@@ -145,5 +170,61 @@ class LoginActivity : AppCompatActivity() {
         secretKey = (keyStore.getEntry(keyAlias, null) as KeyStore.SecretKeyEntry).secretKey
 
         return secretKey
+    }
+
+    private fun verifyInstaller(): Boolean {
+        val installer: String? = this.packageManager.getInstallerPackageName(this.packageName)
+        return installer != null && installer.startsWith("com.android.vending")
+    }
+
+    private fun getCurrentSignature(): String? {
+        try {
+            val packageInfo: PackageInfo =
+                this.packageManager.getPackageInfo(this.packageName, PackageManager.GET_SIGNATURES)
+
+            for (signature in packageInfo.signatures) {
+                val md: MessageDigest = MessageDigest.getInstance("SHA-512")
+                md.update(signature.toByteArray())
+                val currentSignature: String = Base64.encodeToString(md.digest(), Base64.DEFAULT)
+
+                Log.d(
+                    "REMOVEME",
+                    "Include this string as a value for SIGNATURE:" + currentSignature
+                )
+
+                return currentSignature
+            }
+        } catch (e: Exception) {
+            e.stackTrace
+        }
+
+        return null
+    }
+
+    private fun verifySignature(): Boolean {
+        if (getCurrentSignature().equals(SIGNATURE)) {
+            return true
+        }
+        return true
+        //return false
+    }
+
+    private fun isEmulator(): Boolean {
+        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.PRODUCT.contains("sdk_google")
+                || Build.PRODUCT.contains("google_sdk")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("sdk_x86")
+                || Build.PRODUCT.contains("vbox86p")
+                || Build.PRODUCT.contains("emulator")
+                || Build.PRODUCT.contains("simulator"))
     }
 }
