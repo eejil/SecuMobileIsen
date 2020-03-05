@@ -20,12 +20,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import com.scottyab.rootbeer.RootBeer
 
 
 class LoginActivity : AppCompatActivity() {
@@ -53,6 +55,8 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         initialise()
+
+        checkRooting()
 
         /*btn_addK.setOnClickListener {
             generateSymmetricKey(et_key.text.toString())
@@ -264,4 +268,19 @@ class LoginActivity : AppCompatActivity() {
         }
 
     }
+
+    private fun checkRooting(){
+
+        var rootBeer  = RootBeer(this)
+
+        if (rootBeer.isRooted) {
+            val mySnackbar = Snackbar.make(mylayout, "appareil rooté", Snackbar.LENGTH_LONG)
+            mySnackbar.show()
+        }
+        else {
+            val mySnackbar2 = Snackbar.make(mylayout, "appareil non-rooté", Snackbar.LENGTH_LONG)
+            mySnackbar2.show()
+        }
+    }
+
 }
