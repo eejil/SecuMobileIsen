@@ -11,7 +11,6 @@ class Patients {
 
     constructor() {}
 
-
     constructor(date: String, name: String, pathology: String, treatments: String, today: String) {
         this.date = date
         this.name = name
