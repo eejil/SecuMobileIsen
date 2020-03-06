@@ -118,10 +118,10 @@ class MainActivity : AppCompatActivity() {
             val dateVisite = decrypt(patients.date)
 
             productViewHolder.setPatientName(name.toString())
-            productViewHolder.setPatientDate(patho.toString())
-            productViewHolder.setPatientToday(traitement.toString())
-            productViewHolder.setPatientPathology(description.toString())
-            productViewHolder.setPatientTreatments(dateVisite.toString())
+            productViewHolder.setPatientDate(dateVisite.toString())
+            productViewHolder.setPatientToday(description.toString())
+            productViewHolder.setPatientPathology(patho.toString())
+            productViewHolder.setPatientTreatments(traitement.toString())
             //productViewHolder.setPatientImage(patients.image)
         }
 
@@ -147,18 +147,11 @@ class MainActivity : AppCompatActivity() {
 
     fun encrypt(strToEncrypt: String): String? {
         try {
-            val keyStore = KeyStore.getInstance("AndroidKeyStore")
-            keyStore.load(null)
-
-            val secretKey = (keyStore.getEntry(
-                "venotbg",
-                null
-            ) as KeyStore.SecretKeyEntry).secretKey
 
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val key = "azertyuiopazerty"
+            val key = "{name=azeriopaz}"
             val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
 
 
@@ -177,14 +170,6 @@ class MainActivity : AppCompatActivity() {
 
     fun decrypt(strToDecrypt: String?): String? {
         try {
-
-            val keyStore = KeyStore.getInstance("AndroidKeyStore")
-            keyStore.load(null)
-
-            val secretKey = (keyStore.getEntry(
-                "venotbg",
-                null
-            ) as KeyStore.SecretKeyEntry).secretKey
 
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())

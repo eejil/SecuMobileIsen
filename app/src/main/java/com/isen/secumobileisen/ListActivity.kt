@@ -131,7 +131,7 @@ class ListActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val key = "azertyuiopazerty"
+            val key = "{name=azeriopaz}"
             val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
 
 
@@ -150,18 +150,11 @@ class ListActivity : AppCompatActivity() {
 
     fun decrypt(strToDecrypt: String?): String? {
         try {
-            val keyStore = KeyStore.getInstance("AndroidKeyStore")
-            keyStore.load(null)
-
-            val secretKey = (keyStore.getEntry(
-                "venotbg",
-                null
-            ) as KeyStore.SecretKeyEntry).secretKey
 
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val key ="azertyuiopazerty"
+            val key ="{name=azeriopaz}"
             val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
 
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")

@@ -8,17 +8,17 @@
 
     <TextView
         android:id="@+id/listPName"
-        android:layout_width="175dp"
-        android:layout_height="48dp"
+        android:layout_width="275dp"
+        android:layout_height="66dp"
         android:layout_marginTop="28dp"
         android:text="Name"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.292"
+        app:layout_constraintHorizontal_bias="0.117"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.296" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
         android:id="@+id/btn_deletep"

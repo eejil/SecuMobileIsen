@@ -16,6 +16,7 @@ import java.security.KeyStore
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 class HistoActivity : AppCompatActivity() {
 
@@ -84,10 +85,10 @@ class HistoActivity : AppCompatActivity() {
             val dateVisite = decrypt(patients.date)
 
             productViewHolder.setPatientName(name.toString())
-            productViewHolder.setPatientDate(patho.toString())
-            productViewHolder.setPatientToday(traitement.toString())
-            productViewHolder.setPatientPathology(description.toString())
-            productViewHolder.setPatientTreatments(dateVisite.toString())
+            productViewHolder.setPatientDate(dateVisite.toString())
+            productViewHolder.setPatientToday(description.toString())
+            productViewHolder.setPatientPathology(patho.toString())
+            productViewHolder.setPatientTreatments(traitement.toString())
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -99,19 +100,15 @@ class HistoActivity : AppCompatActivity() {
 
     fun decrypt(strToDecrypt: String?): String? {
         try {
-            val keyStore = KeyStore.getInstance("AndroidKeyStore")
-            keyStore.load(null)
 
-            val secretKey = (keyStore.getEntry(
-                "venotbg",
-                null
-            ) as KeyStore.SecretKeyEntry).secretKey
+            val Iv = "jdetestelekotlin"
+            val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val iv = "jdetestelekotlin"
-            val ivParameterSpec = IvParameterSpec(iv.toByteArray())
+            val key ="{name=azeriopaz}"
+            val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
 
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec)
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec, IvParameterSpec)
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")

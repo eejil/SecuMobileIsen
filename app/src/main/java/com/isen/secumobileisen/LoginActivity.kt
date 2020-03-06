@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
     //global variables
     private var email: String? = null
     private var password: String? = null
-    private val SIGNATURE: String = "hYL5eXsOj2A2w0QScIuHki5TdDRZBIUdqWw4HTpjjtr6Lb/1W5eDwfEvf7EHnP8ceToPqApzeWpJ\neA9M4g0RmA==\n"
+    private val SIGNATURE: String = "++wIgyNjiQ00/4z/BjQ3hvlyzn7kmJ1VusY9qQMCxmk2XfHmUNJKbbQpgODIqcoLNh094upBXlr+\njuLXOC8Jmg==\n"
     //UI elements
     private var tvForgotPassword: TextView? = null
     private var etEmail: EditText? = null
@@ -99,12 +99,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        btn_addK.setOnClickListener {
-            generateSymmetricKey(et_key.text.toString())
-        }
-    }
+
 
     private fun initialise() {
         etEmail = findViewById<View>(R.id.et_email) as EditText
@@ -132,10 +127,6 @@ class LoginActivity : AppCompatActivity() {
                         if (task.isSuccessful) {
                             updateUI()
                         } else {
-                            Toast.makeText(
-                                this@LoginActivity, "Authentication failed.",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
                     }
             } else {

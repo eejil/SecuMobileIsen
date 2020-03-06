@@ -125,15 +125,6 @@ class FormActivity : AppCompatActivity() {
                     val document = task.result
                     if (document!!.exists()) {
 
-
-            val keyStore = KeyStore.getInstance("AndroidKeyStore")
-            keyStore.load(null)
-
-            val secretKey = (keyStore.getEntry(
-                "venotbg",
-                null
-            ) as KeyStore.SecretKeyEntry).secretKey
-
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
@@ -185,7 +176,8 @@ class FormActivity : AppCompatActivity() {
     }
 
     private fun addPatientToFirestore(newPatient: Patients) {
-        cloudFirestore.collection("patients").document(newPatient.name.replace("/","A"))
+        cloudFirestore.collection("patients")
+            .document(newPatient.name.replace("/","A"))
             .set(newPatient)
         cloudFirestore.collection("histopatients").document(newPatient.name.replace("/","A"))
             .set(newPatient)
