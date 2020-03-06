@@ -1,20 +1,17 @@
 package com.isen.secumobileisen
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.auth.User
 import kotlinx.android.synthetic.main.activity_home.*
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.KeyGenerator
 
-
-@Suppress("UNREACHABLE_CODE")
 class HomeActivity : AppCompatActivity() {
 
     var cloudFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -38,9 +35,6 @@ class HomeActivity : AppCompatActivity() {
         btn_logout.setOnClickListener {
             logout()
         }
-
-        //createMasterKey()
-        pushMasterKey()
     }
 
     private fun goToHisto() {
@@ -93,13 +87,10 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-        fun pushMasterKey() {
-            val key  = "azertyuiopazerty"
 
-            val data: MutableMap<String, String> =
-                HashMap()
-            data["name"] = key
-            cloudFirestore.collection("masterKey").document("masterKey")
-                .set(data)
-        }
+
+
+
+
+
 }

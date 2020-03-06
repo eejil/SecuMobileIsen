@@ -94,12 +94,7 @@ class CreateAccountActivity : AppCompatActivity() {
                         currentUserDb.child("firstName").setValue(firstName)
                         currentUserDb.child("lastName").setValue(lastName)
                         updateUserInfoAndUI()
-                    } else {
-                        Toast.makeText(
-                            this@CreateAccountActivity, "Authentication failed.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    } 
                 }
         } else {
             Toast.makeText(this, "Enter all details", Toast.LENGTH_SHORT).show()
