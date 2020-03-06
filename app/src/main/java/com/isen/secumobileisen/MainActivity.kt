@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -157,17 +158,14 @@ class MainActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
+            val key = "azertyuiopazerty"
+            val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
+
+
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.ENCRYPT_MODE,secretKey, IvParameterSpec)
+            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, IvParameterSpec)
             val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
 
-            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
-            val doc_alias = "alias" + Base64.getEncoder().encodeToString(cipherText)
-            val iv = cipher.iv.toString()
-
-            val editor = db.edit()
-            editor.putString(doc_alias,iv)
-            editor.commit()
 
             return Base64.getEncoder().encodeToString(cipherText)
 

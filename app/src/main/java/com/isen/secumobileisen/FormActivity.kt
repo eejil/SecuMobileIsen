@@ -2,11 +2,13 @@ package com.isen.secumobileisen
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.DatePicker
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_form.*
 import java.security.KeyStore
@@ -28,9 +30,13 @@ class FormActivity : AppCompatActivity() {
     var cloudFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
+    private var mDatabase: DatabaseReference? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form)
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         textview_date = this.inputDate
         choixDate()
@@ -123,11 +129,11 @@ class FormActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val key ="azertyuiopazerty"
+            val key = "azertyuiopazerty"
             val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
 
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.ENCRYPT_MODE,skeySpec, IvParameterSpec)
+            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, IvParameterSpec)
             val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
 
 
@@ -140,9 +146,9 @@ class FormActivity : AppCompatActivity() {
     }
 
     private fun addPatientToFirestore(newPatient: Patients) {
-        cloudFirestore.collection("patients").document(newPatient.name)
+        cloudFirestore.collection("patients").document(newPatient.name.replace("/","A"))
             .set(newPatient)
-        cloudFirestore.collection("histopatients").document(newPatient.name)
+        cloudFirestore.collection("histopatients").document(newPatient.name.replace("/","A"))
             .set(newPatient)
 
         // [START get_document]
@@ -163,33 +169,23 @@ class FormActivity : AppCompatActivity() {
                         val data: MutableMap<String, String> =
                             HashMap()
                         data["name"] = newPatient.name
-                        cloudFirestore.collection("listpatients").document(newPatient.name)
+                        cloudFirestore.collection("listpatients").document(newPatient.name.replace("/","A"))
                             .set(data)
                     }
-                }
-
-                else {
+                } else {
                     val data: MutableMap<String, String> =
                         HashMap()
                     data["name"] = newPatient.name
-                    cloudFirestore.collection("listpatients").document(newPatient.name)
+                    cloudFirestore.collection("listpatients").document(newPatient.name.replace("/","A"))
                         .set(data)
                 }
             }
         // [END get_document]
-        }
-    private fun getMasterKey():String {
+    }
+
+    private fun getMasterKey(): String {
         var masterKey = ""
-        val docRef =
-            cloudFirestore.collection("masterKey").document("masterKey")
-        docRef.get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val document = task.result
-                if (document!!.exists()) {
-                    masterKey = document.data!!.getValue("name").toString()
-                }
-            }
-        }
+
 
         return masterKey
     }

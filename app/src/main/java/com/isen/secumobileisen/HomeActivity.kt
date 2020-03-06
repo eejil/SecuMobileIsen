@@ -1,17 +1,18 @@
 package com.isen.secumobileisen
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.auth.User
 import kotlinx.android.synthetic.main.activity_home.*
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.KeyGenerator
+
 
 @Suppress("UNREACHABLE_CODE")
 class HomeActivity : AppCompatActivity() {
@@ -101,9 +102,4 @@ class HomeActivity : AppCompatActivity() {
             cloudFirestore.collection("masterKey").document("masterKey")
                 .set(data)
         }
-
-
-
-
-
 }

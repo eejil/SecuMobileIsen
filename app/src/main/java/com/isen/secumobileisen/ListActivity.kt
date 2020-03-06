@@ -21,6 +21,7 @@ import java.security.KeyStore
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 class ListActivity : AppCompatActivity() {
 
@@ -130,17 +131,14 @@ class ListActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
+            val key = "azertyuiopazerty"
+            val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
+
+
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.ENCRYPT_MODE,secretKey, IvParameterSpec)
+            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, IvParameterSpec)
             val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
 
-            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
-            val doc_alias = "alias" + Base64.getEncoder().encodeToString(cipherText)
-            val iv = cipher.iv.toString()
-
-            val editor = db.edit()
-            editor.putString(doc_alias,iv)
-            editor.commit()
 
             return Base64.getEncoder().encodeToString(cipherText)
 
@@ -163,8 +161,11 @@ class ListActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
+            val key ="azertyuiopazerty"
+            val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
+
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec)
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec, IvParameterSpec)
             return String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)))
         } catch (e: java.lang.Exception) {
             println("Error while decrypting: $e")
