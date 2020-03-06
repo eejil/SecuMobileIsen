@@ -136,15 +136,13 @@ class ListActivity : AppCompatActivity() {
             cipher.init(Cipher.ENCRYPT_MODE,secretKey, IvParameterSpec)
             val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
 
-            //TODO: Change SharedPref
-            //val db = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
-            val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
+            val db = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
             val doc_alias = "alias" + Base64.getEncoder().encodeToString(cipherText)
             val iv = cipher.iv.toString()
 
             val editor = db.edit()
             editor.putString(doc_alias,iv)
-            editor.commit()
+            editor.apply()
 
             return Base64.getEncoder().encodeToString(cipherText)
 

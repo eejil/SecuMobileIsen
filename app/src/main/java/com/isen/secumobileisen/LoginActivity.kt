@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
     //global variables
     private var email: String? = null
     private var password: String? = null
-    private val SIGNATURE: String = "HbiYuFB2kKyIs/VLWd92GjauJDceQxrMAnwI9dwJ9DU=\n"
+    private val SIGNATURE: String = "hYL5eXsOj2A2w0QScIuHki5TdDRZBIUdqWw4HTpjjtr6Lb/1W5eDwfEvf7EHnP8ceToPqApzeWpJ\neA9M4g0RmA==\n"
     //UI elements
     private var tvForgotPassword: TextView? = null
     private var etEmail: EditText? = null
@@ -59,30 +59,15 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         if(!goodInstaller()){
-            AlertDialog.Builder(this)
-                .setTitle("ATTENTION")
-                .setMessage("Votre application n'a pas été installée par un programme reconnu.")
-                .setNeutralButton("Ok") { _, _ -> }
-                .create()
-                .show()
+            alertBuilder("n'a pas été installée par un programme reconnu.")
         }
 
         if(isEmulator()){
-            AlertDialog.Builder(this)
-                .setTitle("ATTENTION")
-                .setMessage("Votre application tourne sur un emulateur.")
-                .setNeutralButton("Ok") { _, _ -> }
-                .create()
-                .show()
+            alertBuilder("tourne sur un emulateur.")
         }
 
         if(!goodSignature()){
-            AlertDialog.Builder(this)
-                .setTitle("ATTENTION")
-                .setMessage("Votre application ne possède pas la signature du constructeur.")
-                .setNeutralButton("Ok") { _, _ -> }
-                .create()
-                .show()
+            alertBuilder("ne possède pas la signature du constructeur.")
         }
 
         initialise()
@@ -232,9 +217,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun checkSharedPreferences(mail: String, password: String): Boolean {
-        //TODO: SharedPref
-        //val db = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
-        val db = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
+        val db = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
         val mail_alias = "mail" + mail
         val password_alias = "password" + password
 
@@ -350,6 +333,15 @@ class LoginActivity : AppCompatActivity() {
                 || Build.PRODUCT.contains("vbox86p")
                 || Build.PRODUCT.contains("emulator")
                 || Build.PRODUCT.contains("simulator"))
+    }
+
+    private fun alertBuilder(text: String){
+        AlertDialog.Builder(this)
+            .setTitle("ATTENTION")
+            .setMessage("Votre application " + text)
+            .setNeutralButton("Ok") { _, _ -> }
+            .create()
+            .show()
     }
 
 }

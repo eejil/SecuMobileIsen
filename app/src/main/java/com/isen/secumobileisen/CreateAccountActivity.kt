@@ -75,8 +75,6 @@ class CreateAccountActivity : AppCompatActivity() {
         initEncryptedSharedPreferences()
         saveValue(email.toString(),password.toString())
 
-        addUserSharedPreferences(email.toString(),password.toString())
-
         if (!TextUtils.isEmpty(firstName) && !TextUtils.isEmpty(lastName)
             && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)
         ) {
@@ -132,19 +130,16 @@ class CreateAccountActivity : AppCompatActivity() {
             }
     }
 
-    private fun addUserSharedPreferences(mail: String, password: String) {
+    /*private fun addUserSharedPreferences(mail: String, password: String) {
         val mail_alias = "mail" + mail
         val password_alias = "password" + password
-
-        //TODO: SharedPref
-        //val sp = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
-        val sp = getSharedPreferences("user_db", Activity.MODE_PRIVATE)
+        val sp = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
         val editor = sp.edit()
         editor.putString(mail_alias, mail)
         editor.putString(password_alias,password)
-        editor.commit()
+        editor.apply()
 
-    }
+    }*/
 
     private fun initEncryptedSharedPreferences() {
         getSharedPreferences(preferencesName, MODE_PRIVATE).edit().apply()
@@ -166,10 +161,6 @@ class CreateAccountActivity : AppCompatActivity() {
 
         sharedPreferences.edit().putString(mail_alias, mail).apply()
         sharedPreferences.edit().putString(password_alias, pass).apply()
-    }
-
-    private fun readValue(sharedName: String): String? {
-        return sharedPreferences.getString(sharedName, "")
     }
 
 }
