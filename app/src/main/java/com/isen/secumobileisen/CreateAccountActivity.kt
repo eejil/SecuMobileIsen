@@ -125,16 +125,6 @@ class CreateAccountActivity : AppCompatActivity() {
             }
     }
 
-    /*private fun addUserSharedPreferences(mail: String, password: String) {
-        val mail_alias = "mail" + mail
-        val password_alias = "password" + password
-        val sp = getSharedPreferences(preferencesName, Activity.MODE_PRIVATE)
-        val editor = sp.edit()
-        editor.putString(mail_alias, mail)
-        editor.putString(password_alias,password)
-        editor.apply()
-
-    }*/
 
     private fun initEncryptedSharedPreferences() {
         getSharedPreferences(preferencesName, MODE_PRIVATE).edit().apply()

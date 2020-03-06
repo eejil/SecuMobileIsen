@@ -2,10 +2,10 @@ package com.isen.secumobileisen
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.DatePicker
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -41,7 +41,7 @@ class FormActivity : AppCompatActivity() {
         textview_date = this.inputDate
         choixDate()
         btn_date.setOnClickListener {
-            addPatientToFirestore(setPatient())
+            encrypt()
         }
     }
 
@@ -82,7 +82,7 @@ class FormActivity : AppCompatActivity() {
 
     }
 
-    private fun setPatient(): Patients {
+    /*private fun setPatient(): Patients {
         var name: String?
         var patho: String?
         var traitement: String?
@@ -114,10 +114,18 @@ class FormActivity : AppCompatActivity() {
         return newPatient
 
     }
+*/
 
-
-    fun encrypt(strToEncrypt: String): String? {
+    fun encrypt(): String? {
         try {
+            val docRef =
+                db.collection("masterKey").document("masterKey")
+            docRef.get().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val document = task.result
+                    if (document!!.exists()) {
+
+
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
 
@@ -129,15 +137,46 @@ class FormActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val key = "azertyuiopazerty"
+            val key = document.data.toString()
+                        Log.d("Key:" ,key)
             val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
 
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, IvParameterSpec)
-            val cipherText = cipher.doFinal(strToEncrypt.toByteArray())
+
+                        var name: String?
+                        var patho: String?
+                        var traitement: String?
+                        var description: String?
+                        var dateVisite: String?
+                        name = this.txt_name.editableText.toString()
+                        patho = this.txt_pathology.editableText.toString()
+                        traitement = this.txt_treatments.editableText.toString()
+                        description = this.txt_today.editableText.toString()
+                        dateVisite = textview_date.let { it?.text.toString() }
+
+                        //name = cipher.doFinal(name.toByteArray()).toString()
+                        name = getEncoder().encodeToString(cipher.doFinal(name?.toByteArray(charset("UTF-8"))))
+                        patho = getEncoder().encodeToString(cipher.doFinal(patho?.toByteArray(charset("UTF-8"))))
+                        traitement = getEncoder().encodeToString(cipher.doFinal(traitement?.toByteArray(charset("UTF-8"))))
+                        description = getEncoder().encodeToString(cipher.doFinal(description?.toByteArray(charset("UTF-8"))))
+                        dateVisite = getEncoder().encodeToString(cipher.doFinal(dateVisite?.toByteArray(charset("UTF-8"))))
 
 
-            return getEncoder().encodeToString(cipherText)
+                        var newPatient =
+                            Patients(
+                                dateVisite.toString(),
+                                name.toString(),
+                                patho.toString(),
+                                traitement.toString(),
+                                description.toString()
+                            )
+
+                        addPatientToFirestore(newPatient)
+
+                    }
+                }
+            }
 
         } catch (e: Exception) {
             println("Error while encrypting: $e")

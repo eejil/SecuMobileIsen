@@ -177,6 +177,7 @@ class MainActivity : AppCompatActivity() {
 
     fun decrypt(strToDecrypt: String?): String? {
         try {
+
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
 
@@ -188,7 +189,7 @@ class MainActivity : AppCompatActivity() {
             val Iv = "jdetestelekotlin"
             val IvParameterSpec = IvParameterSpec(Iv.toByteArray())
 
-            val key ="azertyuiopazerty"
+            val key ="{name=azeriopaz}"
             val skeySpec = SecretKeySpec(key.toByteArray(), "AES")
 
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
